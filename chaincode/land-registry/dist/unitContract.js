@@ -39,6 +39,8 @@ let UnitContract = class UnitContract extends fabric_contract_api_1.Contract {
                     sharePercentage: 100
                 }],
             status: 'ACTIVE',
+            encumbrances: [],
+            disputes: [],
             lastUpdated: Math.floor(Date.now() / 1000),
             docHash
         };

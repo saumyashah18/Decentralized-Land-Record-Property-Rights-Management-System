@@ -2,6 +2,7 @@ export interface OwnershipRecord {
     ownerId: string;
     ownershipType: 'FULL' | 'JOINT' | 'INHERITED';
     sharePercentage: number;
+    kycStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
 }
 export interface Parcel {
     docType?: string;
@@ -9,9 +10,11 @@ export interface Parcel {
     area: number;
     location: string;
     owners: OwnershipRecord[];
-    status: 'ACTIVE' | 'FROZEN' | 'RESTRICTED' | 'GOVERNMENT';
+    status: 'ACTIVE' | 'FROZEN' | 'RESTRICTED' | 'GOVERNMENT' | 'PARTITIONED' | 'MERGED';
     encumbrances: string[];
     disputes: string[];
+    parentUlpins?: string[];
+    childUlpins?: string[];
     lastUpdated: number;
     docHash: string;
 }
@@ -22,8 +25,21 @@ export interface Unit {
     uds: number;
     owners: OwnershipRecord[];
     status: 'ACTIVE' | 'FROZEN';
+    encumbrances: string[];
+    disputes: string[];
     lastUpdated: number;
     docHash: string;
+}
+export interface TransferRequest {
+    docType?: string;
+    requestId: string;
+    assetId: string;
+    requesterId: string;
+    newOwners: OwnershipRecord[];
+    type: 'TRANSFER' | 'INHERITANCE';
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    supportingDocs: string[];
+    createdAt: number;
 }
 export interface Dispute {
     docType?: string;
@@ -33,6 +49,7 @@ export interface Dispute {
     status: 'OPEN' | 'RESOLVED';
     createdAt: number;
     resolvedAt?: number;
+    courtOrderHash?: string;
 }
 export interface Encumbrance {
     docType?: string;
@@ -41,4 +58,5 @@ export interface Encumbrance {
     type: 'MORTGAGE' | 'LEASE' | 'LIEN';
     status: 'ACTIVE' | 'RELEASED';
     docHash: string;
+    createdAt: number;
 }

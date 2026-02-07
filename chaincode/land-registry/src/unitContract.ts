@@ -44,6 +44,8 @@ export class UnitContract extends Contract {
                 sharePercentage: 100
             }],
             status: 'ACTIVE',
+            encumbrances: [],
+            disputes: [],
             lastUpdated: Math.floor(Date.now() / 1000),
             docHash
         };
