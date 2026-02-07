@@ -14,11 +14,14 @@ from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import google.generativeai as genai
+from google import genai
 from sqlalchemy import create_engine, Column, String, Text, Integer, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- CONFIGURATION ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,8 +34,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
 
 # Configure GenAI
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-2.0-flash')
+# Configure GenAI
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # --- DB & MODELS ---
 Base = declarative_base()
@@ -169,8 +172,12 @@ User Question: {request.message}
         from fastapi.responses import StreamingResponse
         async def response_generator():
             try:
-                response = model.generate_content(system_prompt, stream=True)
-                for chunk in response:
+                # Streaming with google-genai
+                for chunk in client.models.generate_content_stream(
+                    model='gemini-2.0-flash', 
+                    contents=system_prompt,
+                    config={'response_mime_type': 'text/plain'}
+                ):
                     if chunk.text:
                         yield chunk.text
             except Exception as e:
@@ -178,7 +185,7 @@ User Question: {request.message}
         return StreamingResponse(response_generator(), media_type="text/plain")
     else:
         try:
-            response = model.generate_content(system_prompt)
+            response = client.models.generate_content(model='gemini-2.0-flash', contents=system_prompt)
             return {"response": response.text, "sources": source_ids}
         except Exception as e:
             return {"response": f"Error: {e}", "sources": []}
