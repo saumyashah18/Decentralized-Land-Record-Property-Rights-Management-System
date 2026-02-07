@@ -38,6 +38,42 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 )}
                             </div>
                             <div className="flex items-center space-x-4">
+                                {/* Citizen Navigation */}
+                                {userRole === 'citizen' && (
+                                    <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
+                                        <Link
+                                            to="/dashboard"
+                                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${location.pathname === '/dashboard' ? 'bg-primary/10 text-primary' : 'text-text-muted hover:text-white hover:bg-white/5'}`}
+                                        >
+                                            Home
+                                        </Link>
+                                        <Link
+                                            to="/dashboard"
+                                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${location.pathname.includes('/property') ? 'bg-primary/10 text-primary' : 'text-text-muted hover:text-white hover:bg-white/5'}`}
+                                        >
+                                            My Properties
+                                        </Link>
+                                        <Link
+                                            to="/documents"
+                                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${location.pathname === '/documents' ? 'bg-primary/10 text-primary' : 'text-text-muted hover:text-white hover:bg-white/5'}`}
+                                        >
+                                            Documents
+                                        </Link>
+                                        <Link
+                                            to="/transfer"
+                                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${location.pathname.includes('/transfer') ? 'bg-primary/10 text-primary' : 'text-text-muted hover:text-white hover:bg-white/5'}`}
+                                        >
+                                            Initiate Transfer
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {/* Registrar Navigation */}
+                                {userRole === 'registrar' && (
+                                    <div className="hidden md:flex items-center space-x-6">
+                                        <Link to="/registrar" className="text-sm font-medium text-primary">Registrar Console</Link>
+                                    </div>
+                                )}
                                 {user && (
                                     <div className="hidden md:flex items-center gap-3 mr-4">
                                         <img

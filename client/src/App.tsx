@@ -4,7 +4,10 @@ import { Login } from './pages/Login';
 import { CitizenDashboard } from './pages/CitizenDashboard';
 import { RegistrarDashboard } from './pages/RegistrarDashboard';
 import { PropertyView } from './pages/PropertyView';
+import { Documents } from './pages/Documents';
 import { Transfer } from './pages/Transfer';
+import { TransferSelect } from './pages/TransferSelect';
+import { KYCVerification } from './pages/KYCVerification';
 import { Audit } from './pages/Audit';
 import { RoleGuard } from './components/RoleGuard';
 import { Layout } from './components/Layout';
@@ -28,6 +31,12 @@ function App() {
               </RoleGuard>
             } />
 
+            <Route path="/documents" element={
+              <RoleGuard allowedRoles={['citizen']} userRole="citizen">
+                <Documents />
+              </RoleGuard>
+            } />
+
             <Route path="/registrar" element={
               <RoleGuard allowedRoles={['registrar']} userRole="registrar">
                 <RegistrarDashboard />
@@ -36,6 +45,8 @@ function App() {
 
             <Route path="/property/:id" element={<PropertyView />} />
             <Route path="/transfer/:id" element={<Transfer />} />
+            <Route path="/transfer" element={<TransferSelect />} />
+            <Route path="/kyc" element={<KYCVerification />} />
             <Route path="/audit" element={<Audit />} />
 
             <Route path="/" element={<Navigate to="/login" replace />} />

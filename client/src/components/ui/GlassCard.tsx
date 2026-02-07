@@ -12,8 +12,8 @@ export const GlassCard: React.FC<GlassCardProps> = ({ children, className, hover
     return (
         <div
             className={twMerge(
-                'bg-surface border border-surfaceHighlight backdrop-blur-md rounded-xl p-6 shadow-xl active:scale-[0.98] transition-all duration-300',
-                hoverEffect && 'hover:bg-surfaceHighlight hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1',
+                'bg-white border border-white/20 backdrop-blur-md rounded-xl p-6 shadow-xl active:scale-[0.98] transition-all duration-300 text-slate-900',
+                hoverEffect && 'hover:bg-gray-50 hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1',
                 className
             )}
             {...props}

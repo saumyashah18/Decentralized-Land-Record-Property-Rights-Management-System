@@ -12,7 +12,7 @@ export const Input: React.FC<InputProps> = ({ label, error, className, ...props 
             {label && <label className="block text-sm font-medium text-text-muted mb-1.5">{label}</label>}
             <input
                 className={twMerge(
-                    'w-full bg-surface/50 border border-white/10 rounded-lg px-4 py-2.5 text-text-main placeholder:text-text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200',
+                    'w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-slate-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200',
                     error && 'border-red-500/50 focus:ring-red-500/50',
                     className
                 )}

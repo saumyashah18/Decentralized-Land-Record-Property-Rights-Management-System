@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Badge } from '../components/ui/Badge';
 import { Parcel } from '../types/parcel.types';
+import { useAuth } from '../contexts/AuthContext';
 
 export const CitizenDashboard: React.FC = () => {
     const navigate = useNavigate();
@@ -13,12 +14,12 @@ export const CitizenDashboard: React.FC = () => {
     // Mock Data
     const properties: Parcel[] = [
         {
-            id: '1', parcelId: 'P001', ownerId: 'U001', address: '123 Main St, Tech City',
-            area: 1200, coordinates: [23.123, 72.123], status: 'active', registrationDate: '2023-01-01'
+            id: '1', parcelId: 'P001', ownerId: 'U001', address: '402, Titanium City Center, Satellite, Ahmedabad',
+            area: 1200, coordinates: [23.0300, 72.5176], status: 'active', registrationDate: '2023-01-01'
         },
         {
-            id: '3', parcelId: 'P003', ownerId: 'U001', address: '789 Pine Ave, Green Valley',
-            area: 3500, coordinates: [23.130, 72.130], status: 'pending', registrationDate: '2023-10-15'
+            id: '3', parcelId: 'P003', ownerId: 'U001', address: '78, Shivalik Shilp, Iscon Cross Rd, Ahmedabad',
+            area: 3500, coordinates: [23.0258, 72.5074], status: 'pending', registrationDate: '2023-10-15'
         }
     ];
 
@@ -29,6 +30,21 @@ export const CitizenDashboard: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
+            {/* KYC Banner - Should be conditional based on state in real app */}
+            <GlassCard className="bg-gradient-to-r from-blue-600/20 to-primary/20 border-primary/30 flex justify-between items-center p-4">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-white">Complete your e-KYC</h3>
+                        <p className="text-xs text-blue-200">Verify your Aadhaar to enable property transfers.</p>
+                    </div>
+                </div>
+                <Button size="sm" onClick={() => navigate('/kyc')}>Verify Now</Button>
+            </GlassCard>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
@@ -38,7 +54,7 @@ export const CitizenDashboard: React.FC = () => {
                 </div>
                 <div className="w-full md:w-auto md:min-w-[300px]">
                     <Input
-                        placeholder="Search by Address or ID..."
+                        placeholder="ULPIN/Survey no. , Apartment ID"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />

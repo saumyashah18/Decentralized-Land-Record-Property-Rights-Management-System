@@ -17,8 +17,8 @@ export const PropertyView: React.FC = () => {
 
     // Mock Data
     const parcel: Parcel = {
-        id: id || '1', parcelId: 'P001', ownerId: 'U001', address: '123 Main St, Tech City',
-        area: 1200, coordinates: [23.123, 72.123], status: 'active', registrationDate: '2023-01-01'
+        id: id || '1', parcelId: 'P001', ownerId: 'U001', address: '402, Titanium City Center, Satellite, Ahmedabad',
+        area: 1200, coordinates: [23.0300, 72.5176], status: 'active', registrationDate: '2023-01-01'
     };
 
     const history: Ownership[] = [
@@ -47,7 +47,7 @@ export const PropertyView: React.FC = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-3xl font-bold text-white">{parcel.address}</h1>
+                            <h1 className="text-3xl font-bold text-slate-900">{parcel.address}</h1>
                             <Badge
                                 label={parcel.status.toUpperCase()}
                                 variant={parcel.status === 'active' ? 'success' : 'warning'}
@@ -85,8 +85,8 @@ export const PropertyView: React.FC = () => {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as TabType)}
                                 className={`whitespace-nowrap pb-3 px-1 text-sm font-medium transition-all duration-300 relative ${activeTab === tab.id
-                                        ? 'text-primary'
-                                        : 'text-text-muted hover:text-white'
+                                    ? 'text-primary'
+                                    : 'text-text-muted hover:text-white'
                                     }`}
                             >
                                 {tab.label}
@@ -112,7 +112,7 @@ export const PropertyView: React.FC = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <GlassCard>
-                                        <h3 className="text-lg font-semibold mb-4 text-white">Property Details</h3>
+                                        <h3 className="text-lg font-semibold mb-4 text-slate-900">Property Details</h3>
                                         <div className="space-y-3 text-sm">
                                             <div className="flex justify-between border-b border-white/5 pb-2">
                                                 <span className="text-text-muted">Total Area</span>
@@ -129,7 +129,7 @@ export const PropertyView: React.FC = () => {
                                         </div>
                                     </GlassCard>
                                     <GlassCard>
-                                        <h3 className="text-lg font-semibold mb-4 text-white">Owner Information</h3>
+                                        <h3 className="text-lg font-semibold mb-4 text-slate-900">Owner Information</h3>
                                         <div className="flex items-center gap-4 mb-4">
                                             <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
                                                 JD
