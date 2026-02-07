@@ -14,6 +14,7 @@ export interface RegistrarClaims {
     department?: string;    // Government department
     designation: string;    // e.g., "Sub-Registrar"
     jurisdiction: string;   // e.g., "Mumbai District"
+    role?: string;
 }
 
 export interface OidcSession {

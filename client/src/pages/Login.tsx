@@ -12,7 +12,7 @@ export const Login: React.FC = () => {
     const [step, setStep] = useState<'phone' | 'otp'>('phone');
     const [confirmationResult, setConfirmationResult] = useState<any>(null);
     const navigate = useNavigate();
-    const { signInWithPhone, verifyOtp } = useAuth();
+    const { signInWithPhone, verifyOtp, loginAsDemoCitizen } = useAuth();
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -108,6 +108,28 @@ export const Login: React.FC = () => {
                                         <span className="relative z-10 flex items-center justify-center gap-2 text-lg font-medium">
                                             {loading ? 'Sending...' : 'Send OTP'}
                                         </span>
+                                    </Button>
+
+                                    <div className="relative flex items-center py-2">
+                                        <div className="flex-grow border-t border-gray-200"></div>
+                                        <span className="flex-shrink-0 mx-4 text-gray-400 text-xs">OR</span>
+                                        <div className="flex-grow border-t border-gray-200"></div>
+                                    </div>
+
+                                    {/* Demo Login Button */}
+                                    <Button
+                                        type="button"
+                                        fullWidth
+                                        variant="secondary"
+                                        className="h-12 border-dashed border-2 border-primary/30 text-primary hover:bg-primary/5"
+                                        onClick={async () => {
+                                            setLoading(true);
+                                            await loginAsDemoCitizen();
+                                            navigate('/dashboard');
+                                            setLoading(false);
+                                        }}
+                                    >
+                                        Use Demo Account (Skip OTP)
                                     </Button>
                                 </form>
                             ) : (

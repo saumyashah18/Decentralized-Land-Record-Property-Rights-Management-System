@@ -37,6 +37,7 @@ interface AuthContextType {
     logout: () => Promise<void>;
     userRole: 'citizen' | 'registrar' | null;
     isRegistrar: boolean;
+    loginAsDemoCitizen: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,6 +137,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const loginAsDemoCitizen = async () => {
+        // Mock Firebase User
+        const mockUser: any = {
+            uid: 'demo-citizen-123',
+            phoneNumber: '+919876543210',
+            email: 'demo@citizen.in',
+            displayName: 'Demo Citizen',
+            emailVerified: true,
+            isAnonymous: false,
+            metadata: {},
+            providerData: [],
+            refreshToken: '',
+            tenantId: '',
+            delete: async () => { },
+            getIdToken: async () => 'mock-token',
+            getIdTokenResult: async () => ({
+                authTime: new Date().toISOString(),
+                expirationTime: new Date(Date.now() + 3600000).toISOString(),
+                issuedAtTime: new Date().toISOString(),
+                signInProvider: 'phone',
+                signInSecondFactor: null,
+                token: 'mock-token',
+                claims: {}
+            }),
+            reload: async () => { },
+            toJSON: () => ({})
+        };
+
+        setUser(mockUser);
+        setUserRole('citizen');
+        localStorage.setItem('userRole', 'citizen');
+    };
+
     const isRegistrar = userRole === 'registrar' && registrarSession !== null;
 
     return (
@@ -148,7 +182,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setRegistrarSession,
             logout,
             userRole,
-            isRegistrar
+            isRegistrar,
+            loginAsDemoCitizen
         }}>
             {!loading && children}
         </AuthContext.Provider>
