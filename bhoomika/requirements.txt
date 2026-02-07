@@ -1,0 +1,39 @@
+# Bhoomika AI Assistant - Requirements
+
+# FastAPI server
+fastapi
+uvicorn[standard]
+python-multipart
+
+# CORS support
+starlette
+
+# HuggingFace for BGE-M3 embeddings
+huggingface-hub
+requests
+
+# FAISS for vector storage (CPU version)
+faiss-cpu
+
+# Numerical operations
+numpy
+
+# Knowledge Graph
+networkx
+
+# Database
+sqlalchemy
+
+# Google Gemini
+google-generativeai
+
+# Document processing
+pypdf
+python-docx
+
+# Text processing
+tiktoken
+langchain-text-splitters
+
+# Environment variables
+python-dotenv
