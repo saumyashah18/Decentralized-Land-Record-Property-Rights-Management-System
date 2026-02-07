@@ -24,7 +24,7 @@ const SUGGESTED_PROMPTS = [
     "How to check land records online?"
 ];
 
-export const BhoomikaChat: React.FC<BhoomiChatProps> = ({ className }) => {
+export const BhoomikaChat: React.FC<BhoomikaChatProps> = ({ className }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         {
