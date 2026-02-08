@@ -54,12 +54,12 @@ export const Login: React.FC = () => {
                 {/* Left Side: Auth & Value Prop */}
                 <div className="order-2 lg:order-1 px-6 lg:pl-12 animate-in slide-in-from-left-10 duration-700">
                     <div className="mb-8">
-                        <div className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-6 tracking-wide uppercase">
+                        <div className="inline-block px-3 py-1 rounded-full bg-orange-100 border border-orange-200 text-orange-600 text-xs font-semibold mb-6 tracking-wide uppercase">
                             Blockchain Powered Security
                         </div>
                         <h1 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-6 leading-tight">
                             Powering the Future of <br />
-                            <span className="text-primary">Land Records</span>
+                            <span className="text-orange-600">Land Records</span>
                         </h1>
                         <p className="text-lg text-text-muted leading-relaxed max-w-xl">
                             The all-in-one decentralized platform that brings together citizens, registrars, and transparent property rights. Secure, immutable, and efficient.
@@ -75,9 +75,9 @@ export const Login: React.FC = () => {
 
                                 <div className="grid grid-cols-1 gap-4">
                                     <div
-                                        className="cursor-default rounded-xl p-4 border bg-primary border-primary text-white shadow-lg relative overflow-hidden"
+                                        className="cursor-default rounded-xl p-4 border bg-orange-600 border-orange-600 text-white shadow-lg relative overflow-hidden"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
                                         <div className="text-center font-medium relative z-10 flex items-center justify-center gap-2">
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -97,15 +97,15 @@ export const Login: React.FC = () => {
                                         <input
                                             type="tel"
                                             placeholder="+91 98765 43210"
-                                            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                                            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors"
                                             value={phoneNumber}
                                             onChange={(e) => setPhoneNumber(e.target.value)}
                                             required
                                         />
                                     </div>
                                     <Button fullWidth size="lg" className="h-14 group relative overflow-hidden" type="submit" disabled={loading}>
-                                        <span className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 opacity-80 group-hover:opacity-100 transition-opacity"></span>
-                                        <span className="relative z-10 flex items-center justify-center gap-2 text-lg font-medium">
+                                        <span className="absolute inset-0 bg-gradient-to-r from-orange-500 to-orange-700 opacity-80 group-hover:opacity-100 transition-opacity"></span>
+                                        <span className="relative z-10 flex items-center justify-center gap-2 text-lg font-medium text-white">
                                             {loading ? 'Sending...' : 'Send OTP'}
                                         </span>
                                     </Button>
@@ -121,7 +121,7 @@ export const Login: React.FC = () => {
                                         type="button"
                                         fullWidth
                                         variant="secondary"
-                                        className="h-12 border-dashed border-2 border-primary/30 text-primary hover:bg-primary/5"
+                                        className="h-12 border-dashed border-2 border-orange-500/30 text-orange-600 hover:bg-orange-50 transition-all font-semibold"
                                         onClick={async () => {
                                             setLoading(true);
                                             await loginAsDemoCitizen();
@@ -140,15 +140,15 @@ export const Login: React.FC = () => {
                                             type="text"
                                             placeholder="123456"
                                             maxLength={6}
-                                            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 text-center tracking-[0.5em] text-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                                            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 text-center tracking-[0.5em] text-xl focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors"
                                             value={otp}
                                             onChange={(e) => setOtp(e.target.value)}
                                             required
                                         />
                                     </div>
                                     <Button fullWidth size="lg" className="h-14 group relative overflow-hidden" type="submit" disabled={loading}>
-                                        <span className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 opacity-80 group-hover:opacity-100 transition-opacity"></span>
-                                        <span className="relative z-10 flex items-center justify-center gap-2 text-lg font-medium">
+                                        <span className="absolute inset-0 bg-gradient-to-r from-orange-600 to-amber-600 opacity-80 group-hover:opacity-100 transition-opacity"></span>
+                                        <span className="relative z-10 flex items-center justify-center gap-2 text-lg font-medium text-white">
                                             {loading ? 'Verifying...' : 'Verify & Login'}
                                         </span>
                                     </Button>
@@ -173,7 +173,7 @@ export const Login: React.FC = () => {
                                     Government Official?{' '}
                                     <button
                                         onClick={() => navigate('/registrar/login')}
-                                        className="text-amber-400 hover:underline font-medium"
+                                        className="text-orange-600 hover:text-orange-700 hover:underline font-bold"
                                     >
                                         Login via e-Pramaan
                                     </button>

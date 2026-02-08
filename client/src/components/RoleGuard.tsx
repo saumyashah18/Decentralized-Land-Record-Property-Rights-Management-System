@@ -5,17 +5,19 @@ import { Navigate } from 'react-router-dom';
 interface RoleGuardProps {
     children: React.ReactNode;
     allowedRoles: string[];
-    userRole: string; // Kept for prop compatibility but unused in logic favoring context
+    userRole?: string; // Optional for compatibility
 }
 
 export const RoleGuard: React.FC<RoleGuardProps> = ({ children, allowedRoles }) => {
-    const { user, userRole, loading } = useAuth();
+    const { user, registrarSession, userRole, loading } = useAuth();
 
     if (loading) {
         return <div className="flex h-screen items-center justify-center">Loading...</div>;
     }
 
-    if (!user || !userRole || !allowedRoles.includes(userRole)) {
+    const isAuthenticated = !!user || !!registrarSession;
+
+    if (!isAuthenticated || !userRole || !allowedRoles.includes(userRole)) {
         return <Navigate to="/login" replace />;
     }
 

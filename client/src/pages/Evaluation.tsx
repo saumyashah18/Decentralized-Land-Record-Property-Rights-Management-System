@@ -2,173 +2,429 @@ import React, { useState, useEffect } from 'react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { Badge } from '../components/ui/Badge';
 import { API_BASE_URL } from '../utils/constants';
-
 import { BlockchainVisualizer } from '../components/BlockchainVisualizer';
 
-interface FlowStep {
+// Type definitions
+interface RegistrarNode {
     id: string;
-    title: string;
-    description: string;
-    status: 'pending' | 'processing' | 'completed' | 'failed';
-    icon: string;
-    timestamp?: string;
-    hash?: string;
+    name: string;
+    location: string;
+    status: 'idle' | 'voting' | 'committed';
+    voteTimestamp?: number;
+}
+
+interface FabricScenarioState {
+    parcelId: string;
+    requestId: string;
+    initiator: string;
+    newOwner: string;
+    registrars: RegistrarNode[];
+    currentStage: 'initiated' | 'voting' | 'committed' | 'completed';
+    consensusDetails: {
+        leader: string;
+        votesReceived: number;
+        votesRequired: number;
+        logIndex: number;
+    };
+    timestamp: number;
+}
+
+interface EthereumScenarioState {
+    parcelId: string;
+    fabricTxId: string;
+    fabricHash: string;
+    ethereumTxHash?: string;
+    blockNumber?: number;
+    status: 'pending' | 'hashing' | 'submitting' | 'confirmed';
+    timestamp?: number;
     explorerUrl?: string;
 }
 
 export const Evaluation: React.FC = () => {
-    // Default steps structure
-    const [steps, setSteps] = useState<FlowStep[]>([
-        {
-            id: 'fabric',
-            title: 'Hyperledger Fabric Ledger',
-            description: 'Authoritative storage of land record & ownership history',
-            status: 'pending',
-            icon: '⛓️'
-        },
-        {
-            id: 'hashing',
-            title: 'SHA256 Hash Generation',
-            description: 'Creating a unique cryptographic fingerprint of the record',
-            status: 'pending',
-            icon: '🔐'
-        },
-        {
-            id: 'anchoring',
-            title: 'Polygon Amoy Anchoring',
-            description: 'Submitting hash to public blockchain for immutable proof',
-            status: 'pending',
-            icon: '⚖️'
-        },
-        {
-            id: 'verification',
-            title: 'Public Verification',
-            description: 'Hash verified and accessible via AmoyScan explorer',
-            status: 'pending',
-            icon: '🔍'
-        }
-    ]);
+    const [isTracking, setIsTracking] = useState(false);
+    const [scenario1, setScenario1] = useState<FabricScenarioState | null>(null);
+    const [scenario2, setScenario2] = useState<EthereumScenarioState | null>(null);
 
-    const [isLive, setIsLive] = useState(false);
-    const [parcelId, setParcelId] = useState('P1001'); // Default to our test parcel
-
-    const fetchData = async () => {
+    // Fetch scenario states
+    const fetchScenarios = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/parcels/${parcelId}?user=admin`);
-            if (response.ok) {
-                const data = await response.json();
+            const [res1, res2] = await Promise.all([
+                fetch(`${API_BASE_URL}/evaluation/scenario1/status`),
+                fetch(`${API_BASE_URL}/evaluation/scenario2/status`)
+            ]);
 
-                setSteps(prev => prev.map(s => {
-                    if (s.id === 'fabric') return { ...s, status: 'completed', timestamp: new Date(data.lastUpdated * 1000).toISOString() };
-                    if (s.id === 'hashing') return { ...s, status: 'completed', hash: '0x' + data.docHash.substring(0, 10) + '...' };
-                    if (s.id === 'anchoring') return { ...s, status: 'completed', explorerUrl: `https://amoy.polygonscan.com/tx/0x...` }; // In a real app we'd store the tx hash
-                    if (s.id === 'verification') return { ...s, status: 'completed' };
-                    return s;
-                }));
+            if (res1.ok) {
+                const data1 = await res1.json();
+                setScenario1(data1.data);
+            }
+
+            if (res2.ok) {
+                const data2 = await res2.json();
+                setScenario2(data2.data);
             }
         } catch (error) {
-            console.error("Failed to fetch parcel data", error);
+            console.error('Error fetching scenarios:', error);
         }
     };
 
+    // Start tracking
+    const startTracking = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/evaluation/start`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                setIsTracking(true);
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Failed to start tracking:', response.status, errorData);
+                alert(`Error: ${response.status} ${response.statusText}. Please ensure the server is running and you have authorized the tunnel.`);
+            }
+        } catch (error) {
+            console.error('Error starting tracking:', error);
+            alert('Connection failed. Please ensure the backend server is running at ' + API_BASE_URL);
+        }
+    };
+
+    // Reset scenarios
+    const resetScenarios = async () => {
+        try {
+            await fetch(`${API_BASE_URL}/evaluation/reset`, {
+                method: 'POST'
+            });
+            setIsTracking(false);
+            setScenario1(null);
+            setScenario2(null);
+        } catch (error) {
+            console.error('Error resetting scenarios:', error);
+        }
+    };
+
+    // Poll for updates when tracking
     useEffect(() => {
-        if (isLive) {
-            const interval = setInterval(fetchData, 3000); // Poll every 3 seconds
+        if (isTracking) {
+            const interval = setInterval(fetchScenarios, 1000);
             return () => clearInterval(interval);
         }
-    }, [isLive]);
+    }, [isTracking]);
+
+    // Get status badge variant
+    const getStatusVariant = (status: string): 'success' | 'info' | 'neutral' | 'warning' => {
+        switch (status) {
+            case 'completed':
+            case 'confirmed':
+            case 'committed':
+                return 'success';
+            case 'voting':
+            case 'submitting':
+            case 'hashing':
+                return 'info';
+            default:
+                return 'neutral';
+        }
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Header */}
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent italic">
-                        Evaluation Dashboard - {parcelId}
+                        Evaluation Dashboard
                     </h1>
                     <p className="text-text-muted mt-2">Real-time Hybrid Blockchain Flow Analysis</p>
                 </div>
                 <div className="flex gap-4">
-                    <input
-                        type="text"
-                        value={parcelId}
-                        onChange={(e) => setParcelId(e.target.value)}
-                        className="bg-black/20 border border-white/10 rounded px-3 py-2 text-sm"
-                        placeholder="Enter Parcel ID"
-                    />
                     <button
-                        onClick={() => setIsLive(!isLive)}
-                        className={`px-6 py-2 rounded-full font-semibold transition-all ${isLive ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'bg-primary/20 text-primary border border-primary/50 hover:bg-primary/30'}`}
+                        onClick={startTracking}
+                        disabled={isTracking}
+                        className={`px-6 py-2 rounded-full font-semibold transition-all ${isTracking
+                            ? 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
+                            : 'bg-primary/20 text-primary border border-primary/50 hover:bg-primary/30'
+                            }`}
                     >
-                        {isLive ? '🔴 Stop polling' : '🚀 Start Live Tracking'}
+                        {isTracking ? '🔴 Tracking Active' : '🚀 Start Live Tracking'}
+                    </button>
+                    <button
+                        onClick={resetScenarios}
+                        className="px-6 py-2 rounded-full font-semibold bg-red-500/20 text-red-400 border border-red-500/50 hover:bg-red-500/30 transition-all"
+                    >
+                        🔄 Reset
                     </button>
                 </div>
             </div>
 
-            {/* Live Blockchain Visualizer */}
+            {/* Blockchain Visualizer */}
             <BlockchainVisualizer />
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
-                {/* Connecting Line */}
-                <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 -translate-y-1/2 z-0" />
-
-                {steps.map((step, index) => (
-                    <GlassCard key={step.id} className={`relative z-10 flex flex-col items-center text-center p-6 border-t-4 ${step.status === 'completed' ? 'border-success' :
-                        step.status === 'processing' ? 'border-primary animate-pulse' :
-                            'border-white/10'
-                        }`}>
-                        <div className="text-4xl mb-4 bg-white/5 w-16 h-16 rounded-full flex items-center justify-center shadow-inner">
-                            {step.icon}
+            {/* Two Scenario Panels */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {/* Scenario 1: Hyperledger Fabric Multi-Registrar Workflow */}
+                <GlassCard title="🔗 Scenario 1: Gandhinagar Multi-Registrar Consensus" className="h-full">
+                    <div className="space-y-4">
+                        <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                            <h3 className="font-bold text-lg mb-2">Gujarat Land Record Transfer Flow</h3>
+                            <p className="text-sm text-text-muted">
+                                Demonstrates Raft consensus algorithm with Gandhinagar & GIFT City registrar offices approving a transfer
+                            </p>
                         </div>
-                        <h3 className="font-bold text-lg mb-2">{step.title}</h3>
-                        <p className="text-sm text-text-muted mb-4 flex-grow">{step.description}</p>
 
-                        <Badge
-                            label={step.status.toUpperCase()}
-                            variant={step.status === 'completed' ? 'success' : step.status === 'processing' ? 'info' : 'neutral'}
-                        />
+                        {scenario1 ? (
+                            <>
+                                {/* Transaction Details */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="p-3 bg-white/5 rounded border border-white/10">
+                                        <div className="text-xs text-text-muted uppercase">Land Parcel ID</div>
+                                        <div className="font-mono text-sm mt-1">{scenario1.parcelId}</div>
+                                    </div>
+                                    <div className="p-3 bg-white/5 rounded border border-white/10">
+                                        <div className="text-xs text-text-muted uppercase">Request ID</div>
+                                        <div className="font-mono text-sm mt-1 truncate">{scenario1.requestId}</div>
+                                    </div>
+                                    <div className="p-3 bg-white/5 rounded border border-white/10">
+                                        <div className="text-xs text-text-muted uppercase">Initiator</div>
+                                        <div className="font-mono text-sm mt-1">{scenario1.initiator}</div>
+                                    </div>
+                                    <div className="p-3 bg-white/5 rounded border border-white/10">
+                                        <div className="text-xs text-text-muted uppercase">New Owner</div>
+                                        <div className="font-mono text-sm mt-1">{scenario1.newOwner}</div>
+                                    </div>
+                                </div>
 
-                        {step.hash && (
-                            <div className="mt-4 p-2 bg-black/20 rounded font-mono text-[10px] text-accent truncate w-full">
-                                {step.hash}
+                                {/* Consensus Progress */}
+                                <div className="p-4 bg-accent/10 rounded-lg border border-accent/30">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h4 className="font-semibold">Raft Consensus Progress</h4>
+                                        <Badge
+                                            label={scenario1.currentStage.toUpperCase()}
+                                            variant={getStatusVariant(scenario1.currentStage)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span>Leader Node:</span>
+                                            <span className="font-mono">{scenario1.consensusDetails.leader}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Votes Received:</span>
+                                            <span className="font-mono">
+                                                {scenario1.consensusDetails.votesReceived} / {scenario1.consensusDetails.votesRequired}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Log Index:</span>
+                                            <span className="font-mono">{scenario1.consensusDetails.logIndex}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Registrar Nodes */}
+                                <div className="space-y-3">
+                                    <h4 className="font-semibold">Registrar Offices</h4>
+                                    {scenario1.registrars.map((registrar) => (
+                                        <div
+                                            key={registrar.id}
+                                            className={`p-3 rounded-lg border transition-all ${registrar.status === 'committed'
+                                                ? 'bg-success/10 border-success/50'
+                                                : registrar.status === 'voting'
+                                                    ? 'bg-primary/10 border-primary/50 animate-pulse'
+                                                    : 'bg-white/5 border-white/10'
+                                                }`}
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <div className="font-semibold text-sm">{registrar.name}</div>
+                                                    <div className="text-xs text-text-muted">
+                                                        {registrar.id} • {registrar.location}
+                                                    </div>
+                                                </div>
+                                                <Badge
+                                                    label={registrar.status.toUpperCase()}
+                                                    variant={getStatusVariant(registrar.status)}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-12 text-text-muted">
+                                <p>Click "Start Live Tracking" to begin demonstration</p>
                             </div>
                         )}
+                    </div>
+                </GlassCard>
 
-                        {step.explorerUrl && (
-                            <a
-                                href={step.explorerUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-4 text-xs text-primary hover:underline flex items-center gap-1"
-                            >
-                                View on AmoyScan ↗
-                            </a>
+                {/* Scenario 2: Ethereum Anchoring Workflow */}
+                <GlassCard title="⚡ Scenario 2: Web3.js Ethereum Anchoring" className="h-full">
+                    <div className="space-y-4">
+                        <div className="p-4 bg-accent/10 rounded-lg border border-accent/30">
+                            <h3 className="font-bold text-lg mb-2">Public Blockchain Anchoring</h3>
+                            <p className="text-sm text-text-muted">
+                                Demonstrates hash generation from Fabric and anchoring to Polygon Amoy for public verification
+                            </p>
+                        </div>
+
+                        {scenario2 ? (
+                            <>
+                                {/* Transaction Flow */}
+                                <div className="space-y-3">
+                                    {/* Step 1: Fabric Transaction */}
+                                    <div
+                                        className={`p-4 rounded-lg border transition-all ${scenario2.status !== 'pending'
+                                            ? 'bg-success/10 border-success/50'
+                                            : 'bg-white/5 border-white/10'
+                                            }`}
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">📜</span>
+                                                <span className="font-semibold">Fabric Transaction</span>
+                                            </div>
+                                            {scenario2.status !== 'pending' && <span className="text-success">✓</span>}
+                                        </div>
+                                        <div className="space-y-1 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-text-muted">Parcel ID:</span>
+                                                <span className="font-mono">{scenario2.parcelId}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-text-muted">Fabric TX ID:</span>
+                                                <span className="font-mono text-xs truncate max-w-[200px]">
+                                                    {scenario2.fabricTxId}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Step 2: Hash Generation */}
+                                    <div
+                                        className={`p-4 rounded-lg border transition-all ${scenario2.status === 'hashing' || scenario2.status === 'submitting' || scenario2.status === 'confirmed'
+                                            ? scenario2.status === 'hashing'
+                                                ? 'bg-primary/10 border-primary/50 animate-pulse'
+                                                : 'bg-success/10 border-success/50'
+                                            : 'bg-white/5 border-white/10'
+                                            }`}
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">🔐</span>
+                                                <span className="font-semibold">SHA256 Hash Generation</span>
+                                            </div>
+                                            {(scenario2.status === 'submitting' || scenario2.status === 'confirmed') && (
+                                                <span className="text-success">✓</span>
+                                            )}
+                                        </div>
+                                        {scenario2.fabricHash && (
+                                            <div className="mt-2 p-2 bg-black/30 rounded font-mono text-xs break-all">
+                                                {scenario2.fabricHash}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Step 3: Web3.js Submission */}
+                                    <div
+                                        className={`p-4 rounded-lg border transition-all ${scenario2.status === 'submitting'
+                                            ? 'bg-primary/10 border-primary/50 animate-pulse'
+                                            : scenario2.status === 'confirmed'
+                                                ? 'bg-success/10 border-success/50'
+                                                : 'bg-white/5 border-white/10'
+                                            }`}
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">⚡</span>
+                                                <span className="font-semibold">Web3.js Submission</span>
+                                            </div>
+                                            {scenario2.status === 'confirmed' && <span className="text-success">✓</span>}
+                                        </div>
+                                        <div className="text-sm text-text-muted">
+                                            Submitting to Polygon Amoy Testnet...
+                                        </div>
+                                    </div>
+
+                                    {/* Step 4: Ethereum Confirmation */}
+                                    <div
+                                        className={`p-4 rounded-lg border transition-all ${scenario2.status === 'confirmed'
+                                            ? 'bg-success/10 border-success/50'
+                                            : 'bg-white/5 border-white/10'
+                                            }`}
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">🔍</span>
+                                                <span className="font-semibold">Public Verification</span>
+                                            </div>
+                                            {scenario2.status === 'confirmed' && <span className="text-success">✓</span>}
+                                        </div>
+                                        {scenario2.ethereumTxHash && (
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-text-muted">TX Hash:</span>
+                                                    <span className="font-mono text-xs truncate max-w-[200px]">
+                                                        {scenario2.ethereumTxHash}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-text-muted">Block Number:</span>
+                                                    <span className="font-mono">{scenario2.blockNumber}</span>
+                                                </div>
+                                                {scenario2.explorerUrl && (
+                                                    <a
+                                                        href={scenario2.explorerUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-primary hover:underline flex items-center gap-1 mt-2"
+                                                    >
+                                                        View on PolygonScan ↗
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-12 text-text-muted">
+                                <p>Click "Start Live Tracking" to begin demonstration</p>
+                            </div>
                         )}
-                    </GlassCard>
-                ))}
+                    </div>
+                </GlassCard>
             </div>
 
+            {/* System Information */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <GlassCard title="Architecture Integrity (Proof)" className="h-full">
                     <div className="space-y-4">
                         <div className="flex items-center gap-4 p-3 bg-white/5 rounded-lg border border-white/5">
                             <div className="p-2 bg-primary/20 rounded">📜</div>
                             <div>
-                                <div className="text-sm font-semibold text-text-muted uppercase tracking-tighter">Fabric Channel</div>
+                                <div className="text-sm font-semibold text-text-muted uppercase tracking-tighter">
+                                    Fabric Channel
+                                </div>
                                 <div className="font-mono text-sm">mychannel</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 p-3 bg-white/5 rounded-lg border border-white/5">
                             <div className="p-2 bg-accent/20 rounded">🌍</div>
                             <div>
-                                <div className="text-sm font-semibold text-text-muted uppercase tracking-tighter">Polygon Network</div>
+                                <div className="text-sm font-semibold text-text-muted uppercase tracking-tighter">
+                                    Polygon Network
+                                </div>
                                 <div className="font-mono text-sm">Amoy Testnet (80002)</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 p-3 bg-white/5 rounded-lg border border-white/5">
                             <div className="p-2 bg-success/20 rounded">📄</div>
                             <div>
-                                <div className="text-sm font-semibold text-text-muted uppercase tracking-tighter">Anchor Contract</div>
-                                <div className="font-mono text-sm truncate max-w-[200px]">0x0bb955b22105bA7D6F89aBCbEE1860e4DAD85A79</div>
+                                <div className="text-sm font-semibold text-text-muted uppercase tracking-tighter">
+                                    Anchor Contract
+                                </div>
+                                <div className="font-mono text-sm truncate max-w-[200px]">
+                                    0x0bb955b22105bA7D6F89aBCbEE1860e4DAD85A79
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -12,6 +12,7 @@ import mapRoutes from './routes/map.routes';
 import debugRoutes from './routes/debug.routes';
 import kycRoutes from './routes/kyc.routes';
 import authRoutes from './routes/auth.routes';
+import evaluationRoutes from './routes/evaluation.routes';
 import { getWeb3Client } from './ethereum/web3Client';
 
 dotenv.config();
@@ -36,6 +37,7 @@ app.use('/api/map', mapRoutes);
 app.use('/api/debug', debugRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/evaluation', evaluationRoutes);
 
 // Health Check
 app.get('/health', async (req: Request, res: Response) => {

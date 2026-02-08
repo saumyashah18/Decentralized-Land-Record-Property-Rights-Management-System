@@ -34,19 +34,19 @@ function App() {
             <Route path="/registrar/callback" element={<RegistrarCallback />} />
 
             <Route path="/dashboard" element={
-              <RoleGuard allowedRoles={['citizen']} userRole="citizen">
+              <RoleGuard allowedRoles={['citizen']}>
                 <CitizenDashboard />
               </RoleGuard>
             } />
 
             <Route path="/documents" element={
-              <RoleGuard allowedRoles={['citizen']} userRole="citizen">
+              <RoleGuard allowedRoles={['citizen']}>
                 <Documents />
               </RoleGuard>
             } />
 
             <Route path="/registrar" element={
-              <RoleGuard allowedRoles={['registrar']} userRole="registrar">
+              <RoleGuard allowedRoles={['registrar']}>
                 <RegistrarDashboard />
               </RoleGuard>
             } />
@@ -55,7 +55,7 @@ function App() {
             <Route path="/transfer/:id" element={<Transfer />} />
             <Route path="/transfer" element={<TransferSelect />} />
             <Route path="/kyc" element={
-              <RoleGuard allowedRoles={['citizen', 'registrar']} userRole="citizen">
+              <RoleGuard allowedRoles={['citizen', 'registrar']}>
                 <KYCVerification />
               </RoleGuard>
             } />

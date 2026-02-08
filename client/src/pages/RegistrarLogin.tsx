@@ -53,7 +53,7 @@ export const RegistrarLogin: React.FC = () => {
                 };
 
                 setRegistrarSession(session);
-                navigate('/registrar/dashboard');
+                navigate('/registrar');
             } else {
                 setError('Demo login failed');
             }
