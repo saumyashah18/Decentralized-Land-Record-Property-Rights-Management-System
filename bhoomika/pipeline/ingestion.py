@@ -25,11 +25,21 @@ class DocumentIngestion:
         self.knowledge_graph = get_knowledge_graph()
     
     def ingest_file(self, filepath: str, title: Optional[str] = None, 
-                    description: Optional[str] = None) -> str:
+                    description: Optional[str] = None, use_multi_granularity: bool = True) -> str:
         """
         Ingest a single file into the RAG system.
+        
+        Args:
+            filepath: Path to file
+            title: Optional title
+            description: Optional description
+            use_multi_granularity: If True, use S/M/L chunking; if False, use legacy chunking
+        
         Returns document ID.
         """
+        from models.chunk_types import ChunkType
+        from pipeline.chunking import chunk_document_multi_granularity
+        
         # Determine file type
         filename = os.path.basename(filepath)
         extension = os.path.splitext(filename)[1].lower()
@@ -59,39 +69,90 @@ class DocumentIngestion:
             description=description
         )
         
-        # Chunk the document
-        chunks = chunk_document(text)
-        
-        # Process chunks
-        chunk_ids = []
-        chunk_texts = []
-        
-        for i, (chunk_text, start_char, end_char) in enumerate(chunks):
-            chunk_id = f"{doc_id}_chunk_{i}"
-            chunk_ids.append(chunk_id)
-            chunk_texts.append(chunk_text)
+        if use_multi_granularity:
+            # Multi-granularity chunking
+            chunks_by_type = chunk_document_multi_granularity(text)
             
-            # Store chunk metadata
-            self.sqlite_store.add_chunk(
-                chunk_id=chunk_id,
-                document_id=doc_id,
-                content=chunk_text,
-                chunk_index=i,
-                start_char=start_char,
-                end_char=end_char
-            )
+            all_chunk_ids = []
+            all_chunk_texts = []
+            embed_chunk_ids = []
+            embed_chunk_texts = []
+            
+            chunk_counter = 0
+            
+            # Process each chunk type
+            for chunk_type, chunks in chunks_by_type.items():
+                for chunk_text, start_char, end_char in chunks:
+                    chunk_id = f"{doc_id}_chunk_{chunk_counter}_{chunk_type.value}"
+                    
+                    # Store chunk metadata
+                    self.sqlite_store.add_chunk(
+                        chunk_id=chunk_id,
+                        document_id=doc_id,
+                        content=chunk_text,
+                        chunk_index=chunk_counter,
+                        chunk_type=chunk_type.value,
+                        start_char=start_char,
+                        end_char=end_char
+                    )
+                    
+                    all_chunk_ids.append(chunk_id)
+                    all_chunk_texts.append(chunk_text)
+                    
+                    # Only embed S and M chunks (L chunks are for context only)
+                    if chunk_type in [ChunkType.SMALL, ChunkType.MEDIUM]:
+                        embed_chunk_ids.append(chunk_id)
+                        embed_chunk_texts.append(chunk_text)
+                    
+                    chunk_counter += 1
+            
+            # Generate embeddings for S and M chunks only
+            if embed_chunk_texts:
+                embeddings = self.embeddings.embed_batch(embed_chunk_texts)
+                self.faiss_store.add_batch(embed_chunk_ids, embeddings)
+            
+            # Build knowledge graph
+            self.knowledge_graph.add_sequential_edges(all_chunk_ids, doc_id)
+            
+            # Add keyword-based relations (deterministic)
+            self.knowledge_graph.add_keyword_relations(all_chunk_ids, all_chunk_texts, doc_id)
+            
+            # Add semantic edges for embedded chunks
+            if embed_chunk_texts and len(embed_chunk_texts) > 1:
+                self._add_semantic_edges(embed_chunk_ids, embeddings)
         
-        # Generate embeddings in batch
-        embeddings = self.embeddings.embed_batch(chunk_texts)
-        
-        # Add to FAISS
-        self.faiss_store.add_batch(chunk_ids, embeddings)
-        
-        # Build knowledge graph edges
-        self.knowledge_graph.add_sequential_edges(chunk_ids, doc_id)
-        
-        # Add semantic edges based on embedding similarity
-        self._add_semantic_edges(chunk_ids, embeddings)
+        else:
+            # Legacy chunking (backward compatibility)
+            chunks = chunk_document(text)
+            
+            chunk_ids = []
+            chunk_texts = []
+            
+            for i, (chunk_text, start_char, end_char) in enumerate(chunks):
+                chunk_id = f"{doc_id}_chunk_{i}"
+                chunk_ids.append(chunk_id)
+                chunk_texts.append(chunk_text)
+                
+                # Store chunk metadata
+                self.sqlite_store.add_chunk(
+                    chunk_id=chunk_id,
+                    document_id=doc_id,
+                    content=chunk_text,
+                    chunk_index=i,
+                    chunk_type='M',  # Default to medium
+                    start_char=start_char,
+                    end_char=end_char
+                )
+            
+            # Generate embeddings
+            embeddings = self.embeddings.embed_batch(chunk_texts)
+            
+            # Add to FAISS
+            self.faiss_store.add_batch(chunk_ids, embeddings)
+            
+            # Build graph
+            self.knowledge_graph.add_sequential_edges(chunk_ids, doc_id)
+            self._add_semantic_edges(chunk_ids, embeddings)
         
         # Persist all stores
         self.faiss_store.save()
@@ -99,11 +160,22 @@ class DocumentIngestion:
         
         return doc_id
     
-    def ingest_text(self, text: str, title: str, description: Optional[str] = None) -> str:
+    def ingest_text(self, text: str, title: str, description: Optional[str] = None,
+                    use_multi_granularity: bool = True) -> str:
         """
         Ingest raw text content.
+        
+        Args:
+            text: Text content
+            title: Document title
+            description: Optional description
+            use_multi_granularity: If True, use S/M/L chunking
+        
         Returns document ID.
         """
+        from models.chunk_types import ChunkType
+        from pipeline.chunking import chunk_document_multi_granularity
+        
         if not text or len(text.strip()) == 0:
             raise ValueError("Empty text content")
         
@@ -118,35 +190,78 @@ class DocumentIngestion:
             description=description
         )
         
-        # Chunk the text
-        chunks = chunk_document(text)
-        
-        chunk_ids = []
-        chunk_texts = []
-        
-        for i, (chunk_text, start_char, end_char) in enumerate(chunks):
-            chunk_id = f"{doc_id}_chunk_{i}"
-            chunk_ids.append(chunk_id)
-            chunk_texts.append(chunk_text)
+        if use_multi_granularity:
+            # Multi-granularity chunking
+            chunks_by_type = chunk_document_multi_granularity(text)
             
-            self.sqlite_store.add_chunk(
-                chunk_id=chunk_id,
-                document_id=doc_id,
-                content=chunk_text,
-                chunk_index=i,
-                start_char=start_char,
-                end_char=end_char
-            )
+            all_chunk_ids = []
+            all_chunk_texts = []
+            embed_chunk_ids = []
+            embed_chunk_texts = []
+            
+            chunk_counter = 0
+            
+            for chunk_type, chunks in chunks_by_type.items():
+                for chunk_text, start_char, end_char in chunks:
+                    chunk_id = f"{doc_id}_chunk_{chunk_counter}_{chunk_type.value}"
+                    
+                    self.sqlite_store.add_chunk(
+                        chunk_id=chunk_id,
+                        document_id=doc_id,
+                        content=chunk_text,
+                        chunk_index=chunk_counter,
+                        chunk_type=chunk_type.value,
+                        start_char=start_char,
+                        end_char=end_char
+                    )
+                    
+                    all_chunk_ids.append(chunk_id)
+                    all_chunk_texts.append(chunk_text)
+                    
+                    if chunk_type in [ChunkType.SMALL, ChunkType.MEDIUM]:
+                        embed_chunk_ids.append(chunk_id)
+                        embed_chunk_texts.append(chunk_text)
+                    
+                    chunk_counter += 1
+            
+            # Embed S and M chunks
+            if embed_chunk_texts:
+                embeddings = self.embeddings.embed_batch(embed_chunk_texts)
+                self.faiss_store.add_batch(embed_chunk_ids, embeddings)
+            
+            # Build graph
+            self.knowledge_graph.add_sequential_edges(all_chunk_ids, doc_id)
+            self.knowledge_graph.add_keyword_relations(all_chunk_ids, all_chunk_texts, doc_id)
+            
+            if embed_chunk_texts and len(embed_chunk_texts) > 1:
+                self._add_semantic_edges(embed_chunk_ids, embeddings)
         
-        # Generate embeddings
-        embeddings = self.embeddings.embed_batch(chunk_texts)
-        
-        # Add to FAISS
-        self.faiss_store.add_batch(chunk_ids, embeddings)
-        
-        # Build graph
-        self.knowledge_graph.add_sequential_edges(chunk_ids, doc_id)
-        self._add_semantic_edges(chunk_ids, embeddings)
+        else:
+            # Legacy chunking
+            chunks = chunk_document(text)
+            
+            chunk_ids = []
+            chunk_texts = []
+            
+            for i, (chunk_text, start_char, end_char) in enumerate(chunks):
+                chunk_id = f"{doc_id}_chunk_{i}"
+                chunk_ids.append(chunk_id)
+                chunk_texts.append(chunk_text)
+                
+                self.sqlite_store.add_chunk(
+                    chunk_id=chunk_id,
+                    document_id=doc_id,
+                    content=chunk_text,
+                    chunk_index=i,
+                    chunk_type='M',
+                    start_char=start_char,
+                    end_char=end_char
+                )
+            
+            embeddings = self.embeddings.embed_batch(chunk_texts)
+            self.faiss_store.add_batch(chunk_ids, embeddings)
+            self.knowledge_graph.add_sequential_edges(chunk_ids, doc_id)
+            self._add_semantic_edges(chunk_ids, embeddings)
         
         # Persist
         self.faiss_store.save()

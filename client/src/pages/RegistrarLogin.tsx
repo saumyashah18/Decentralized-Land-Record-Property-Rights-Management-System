@@ -13,7 +13,7 @@ export const RegistrarLogin: React.FC = () => {
     const { setRegistrarSession } = useAuth();
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-
+    const [demoLoading, setDemoLoading] = useState(false);
 
     // Check for error from OIDC callback
     useEffect(() => {
@@ -27,6 +27,41 @@ export const RegistrarLogin: React.FC = () => {
         setLoading(true);
         // Redirect to backend OIDC endpoint
         window.location.href = `${API_BASE_URL}/auth/registrar/login`;
+    };
+
+    const handleDemoLogin = async () => {
+        setDemoLoading(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/registrar/demo-login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+
+            if (data.success && data.token) {
+                // Decode token to get claims (simple decode for demo)
+                const payload = JSON.parse(atob(data.token));
+
+                const session = {
+                    sessionToken: data.token,
+                    claims: {
+                        sub: payload.sub,
+                        name: 'Demo Registrar',
+                        designation: 'Sub-Registrar',
+                        jurisdiction: 'District A'
+                    }
+                };
+
+                setRegistrarSession(session);
+                navigate('/registrar/dashboard');
+            } else {
+                setError('Demo login failed');
+            }
+        } catch (err) {
+            setError('Failed to connect to backend');
+        } finally {
+            setDemoLoading(false);
+        }
     };
 
 
@@ -85,11 +120,34 @@ export const RegistrarLogin: React.FC = () => {
                             fullWidth
                             size="lg"
                             onClick={handleLogin}
-                            disabled={loading}
+                            disabled={loading || demoLoading}
                             className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 h-14 shadow-lg shadow-orange-500/20"
                         >
                             <span className="flex items-center justify-center gap-3 font-semibold text-lg">
                                 {loading ? 'Redirecting...' : 'Login with e-Pramaan'}
+                            </span>
+                        </Button>
+
+                        {/* Demo Login Option */}
+                        <div className="relative pt-4">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-200"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-gray-500">Development Access</span>
+                            </div>
+                        </div>
+
+                        <Button
+                            fullWidth
+                            variant="secondary"
+                            onClick={handleDemoLogin}
+                            disabled={loading || demoLoading}
+                            className="h-12 border-dashed border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                        >
+                            <span className="flex items-center justify-center gap-2 text-gray-600">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                                {demoLoading ? 'Creating Session...' : 'Bypass Login (Demo Mode)'}
                             </span>
                         </Button>
                     </div>

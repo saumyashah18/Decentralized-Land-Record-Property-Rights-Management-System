@@ -29,8 +29,7 @@ export const KYCVerification: React.FC = () => {
         try {
             const response = await kycService.initiate(cleanAadhaar, user?.uid || 'anonymous');
             setRequestId(response.id);
-            // In a real Digio flow, we'd open their SDK here. 
-            // For now, we simulate the OTP step to show the integrated flow.
+            // Simulate the OTP step to show the integrated flow.
             setStep(2);
         } catch (err: any) {
             setError(err.message || 'Failed to initiate verification');
@@ -58,7 +57,7 @@ export const KYCVerification: React.FC = () => {
 
     const handleDigiLocker = async () => {
         setLoading(true);
-        // Simulate Digio linking DigiLocker
+        // Simulate linking DigiLocker
         await new Promise(resolve => setTimeout(resolve, 1500));
         setLoading(false);
         setStep(4);

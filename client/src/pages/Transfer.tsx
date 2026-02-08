@@ -22,11 +22,32 @@ export const Transfer: React.FC = () => {
         e.preventDefault();
         setIsProcessing(true);
 
-        // Simulate API call to Registrar
-        setTimeout(() => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/transfers`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    assetId: id || 'UNKNOWN_ASSET',
+                    newOwnerId: 'BUYER_ID_PLACEHOLDER', // TODO: Get from form or context
+                    user: 'SELLER_ID_PLACEHOLDER', // TODO: Get from auth context
+                    documents: uploadedFiles
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Transfer initiated:', data);
+                setIsSuccess(true);
+            } else {
+                console.error('Transfer failed');
+                alert('Failed to initiate transfer');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error connecting to server');
+        } finally {
             setIsProcessing(false);
-            setIsSuccess(true);
-        }, 2000);
+        }
     };
 
     if (isSuccess) {

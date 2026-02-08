@@ -19,3 +19,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model TransferRequest {
+  id              String   @id @default(uuid())
+  requestId       String   @unique
+  assetId         String
+  sellerId        String   @default("User A") // Placeholder until auth is fully integrated
+  buyerId         String
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  requestDate     DateTime @default(now())
+  documents       String   @default("[]") // JSON string of document names
+  remarks         String?
+}

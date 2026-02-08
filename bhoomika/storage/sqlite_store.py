@@ -36,9 +36,10 @@ class Chunk(Base):
     document_id = Column(String(50), ForeignKey('documents.id'), nullable=False)
     content = Column(Text, nullable=False)
     chunk_index = Column(Integer)
+    chunk_type = Column(String(10), default='M')  # S, M, or L for multi-granularity
     start_char = Column(Integer)
     end_char = Column(Integer)
-    metadata = Column(Text)  # JSON string for additional metadata
+    chunk_metadata = Column(Text)  # JSON string for additional metadata (renamed from 'metadata')
     
     document = relationship("Document", back_populates="chunks")
 
@@ -88,17 +89,19 @@ class SQLiteStore:
     
     # Chunk operations
     def add_chunk(self, chunk_id: str, document_id: str, content: str, 
-                  chunk_index: int = 0, start_char: int = 0, end_char: int = 0,
-                  metadata: str = None) -> Chunk:
+                  chunk_index: int = 0, chunk_type: str = 'M',
+                  start_char: int = 0, end_char: int = 0,
+                  chunk_metadata: str = None) -> Chunk:
         """Add a new chunk"""
         chunk = Chunk(
             id=chunk_id,
             document_id=document_id,
             content=content,
             chunk_index=chunk_index,
+            chunk_type=chunk_type,
             start_char=start_char,
             end_char=end_char,
-            metadata=metadata
+            chunk_metadata=chunk_metadata
         )
         self.session.add(chunk)
         self.session.commit()
@@ -111,6 +114,10 @@ class SQLiteStore:
     def get_chunks_by_document(self, document_id: str):
         """Get all chunks for a document"""
         return self.session.query(Chunk).filter_by(document_id=document_id).order_by(Chunk.chunk_index).all()
+    
+    def get_chunks_by_type(self, chunk_type: str):
+        """Get all chunks of a specific type (S, M, or L)"""
+        return self.session.query(Chunk).filter_by(chunk_type=chunk_type).all()
     
     def get_chunk_content(self, chunk_id: str) -> str:
         """Get chunk content by ID"""

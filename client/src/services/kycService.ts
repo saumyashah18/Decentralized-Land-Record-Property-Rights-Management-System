@@ -12,7 +12,7 @@ export interface KycResponse {
 
 export const kycService = {
     initiate: async (aadhaarNumber: string, customerIdentifier: string): Promise<KycResponse> => {
-        // In a real app, this calls our backend which then calls Digio
+        // Calls backend to initiate KYC flow
         const response = await axios.post(`${API_BASE_URL}/kyc/initiate`, {
             aadhaarNumber,
             customerIdentifier,

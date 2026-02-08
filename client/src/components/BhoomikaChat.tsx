@@ -223,11 +223,19 @@ export const BhoomikaChat: React.FC<BhoomikaChatProps> = ({ className }) => {
                                             : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none'
                                             }`}
                                     >
-                                        <div className={`prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-invert text-white' : 'text-gray-800 dark:text-gray-200 dark:prose-invert'}`}>
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                {msg.content}
-                                            </ReactMarkdown>
-                                        </div>
+                                        {msg.role === 'assistant' && !msg.content ? (
+                                            <div className="flex gap-1 py-1">
+                                                <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                                <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                                <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                            </div>
+                                        ) : (
+                                            <div className={`prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-invert text-white' : 'text-gray-800 dark:text-gray-200 dark:prose-invert'}`}>
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                    {msg.content}
+                                                </ReactMarkdown>
+                                            </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             ))}
@@ -239,7 +247,11 @@ export const BhoomikaChat: React.FC<BhoomikaChatProps> = ({ className }) => {
                                     className="flex justify-start"
                                 >
                                     <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex items-center gap-2">
-                                        <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
+                                        <div className="flex gap-1">
+                                            <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                            <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                            <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                        </div>
                                         <span className="text-sm text-gray-500">Bhoomika is thinking...</span>
                                     </div>
                                 </motion.div>

@@ -52,7 +52,11 @@ class OidcService {
         if (this.config) return;
 
         try {
-            const issuerUrl = new URL(`https://${this.domain}`);
+            let issuerStr = this.domain;
+            if (!issuerStr.startsWith('http')) {
+                issuerStr = `https://${issuerStr}`;
+            }
+            const issuerUrl = new URL(issuerStr);
 
             this.config = await client.discovery(
                 issuerUrl,
@@ -60,7 +64,7 @@ class OidcService {
                 this.clientSecret
             );
 
-            console.log('✅ OIDC Client initialized for Auth0');
+            console.log(`✅ OIDC Client initialized for ${issuerUrl.hostname}`);
         } catch (error) {
             console.error('❌ Failed to initialize OIDC client:', error);
             // Don't throw - allow app to start without OIDC

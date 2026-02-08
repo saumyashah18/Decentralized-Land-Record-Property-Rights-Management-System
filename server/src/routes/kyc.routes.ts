@@ -33,7 +33,7 @@ router.get('/status/:id', async (req: Request, res: Response) => {
 // POST /api/kyc/webhook
 router.post('/webhook', (req: Request, res: Response) => {
     console.log('Received KYC Webhook:', req.body);
-    // Logic to handle async updates from Digio would go here
+    // Logic to handle async updates would go here
     res.status(200).send('Webhook Received');
 });
 

@@ -5,28 +5,30 @@ import * as path from 'path';
 async function main() {
     try {
         // Path to wallet
-        const walletPath = path.join(__dirname, '..', 'wallet');
-
-        // Remove existing wallet to be clean? No, let's overwrite if needed.
-        if (fs.existsSync(walletPath)) {
-            // fs.rmSync(walletPath, { recursive: true, force: true });
-        }
-
+        const walletPath = path.join(__dirname, '..', '..', 'wallet');
         const wallet = await Wallets.newFileSystemWallet(walletPath);
         console.log(`Wallet path: ${walletPath}`);
 
         // Paths to credentials
         const credPath = path.resolve(__dirname, '..', '..', '..', 'fabric-samples', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'users', 'Admin@org1.example.com', 'msp');
-        const certPath = path.join(credPath, 'signcerts', 'cert.pem');
-        const keyPath = path.join(credPath, 'keystore', '22d367b7bcad7f434babfb612ebf806d28aae3c1dd579a8df916c42d9e8b230b_sk');
+        const certPath = path.join(credPath, 'signcerts');
+        const keyPath = path.join(credPath, 'keystore');
 
-        if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
+        // Find the certificate file
+        const certFiles = fs.readdirSync(certPath);
+        const certFile = certFiles.find(f => f.endsWith('.pem'));
+
+        // Find the private key file
+        const keyFiles = fs.readdirSync(keyPath);
+        const keyFile = keyFiles.find(f => f.endsWith('_sk'));
+
+        if (!certFile || !keyFile) {
             console.error(`Credentials not found at ${credPath}`);
             process.exit(1);
         }
 
-        const cert = fs.readFileSync(certPath).toString();
-        const key = fs.readFileSync(keyPath).toString();
+        const cert = fs.readFileSync(path.join(certPath, certFile)).toString();
+        const key = fs.readFileSync(path.join(keyPath, keyFile)).toString();
 
         const x509Identity = {
             credentials: {
@@ -38,10 +40,10 @@ async function main() {
         };
 
         await wallet.put('admin', x509Identity);
-        console.log('Successfully imported existing Admin identity into the wallet');
+        console.log('✅ Successfully imported Admin identity into the wallet');
 
     } catch (error) {
-        console.error(`Failed to import admin: ${error}`);
+        console.error(`❌ Failed to import admin: ${error}`);
         process.exit(1);
     }
 }

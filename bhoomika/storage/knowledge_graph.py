@@ -107,6 +107,57 @@ class KnowledgeGraph:
     def edge_count(self) -> int:
         """Return number of edges"""
         return self.graph.number_of_edges()
+    
+    def add_keyword_relations(self, chunk_ids: list, chunk_texts: list, document_id: str):
+        """
+        Build deterministic keyword-based relations between chunks.
+        Inspired by EduRank's knowledge graph approach.
+        
+        Extracts capitalized keywords (>4 chars) and creates relations
+        between chunks that share concepts.
+        """
+        import re
+        
+        if len(chunk_ids) < 2:
+            return
+        
+        # Stopwords to ignore
+        ignore_words = {
+            'this', 'that', 'there', 'their', 'these', 'those',
+            'chapter', 'section', 'about', 'would', 'could', 'should',
+            'which', 'where', 'while', 'when', 'what'
+        }
+        
+        # Extract keywords for each chunk
+        chunk_keywords = {}
+        for chunk_id, text in zip(chunk_ids, chunk_texts):
+            # Find capitalized words (potential proper nouns, concepts)
+            keywords = set()
+            found = re.findall(r'\b[A-Z][a-z]{4,}\b', text)
+            for word in found:
+                if word.lower() not in ignore_words:
+                    keywords.add(word)
+            
+            # Also extract acronyms (all caps, 2+ letters)
+            acronyms = re.findall(r'\b[A-Z]{2,}\b', text)
+            keywords.update(acronyms)
+            
+            chunk_keywords[chunk_id] = keywords
+        
+        # Create relations based on shared keywords
+        for i, chunk_id_1 in enumerate(chunk_ids):
+            for chunk_id_2 in chunk_ids[i+1:]:
+                shared = chunk_keywords[chunk_id_1] & chunk_keywords[chunk_id_2]
+                
+                if shared:
+                    # Use first shared keyword as relation type
+                    keyword = list(shared)[0]
+                    self.add_edge(
+                        chunk_id_1,
+                        chunk_id_2,
+                        weight=0.9,
+                        relationship=f"shared_concept:{keyword}"
+                    )
 
 
 # Singleton instance

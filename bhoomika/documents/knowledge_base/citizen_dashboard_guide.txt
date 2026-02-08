@@ -1,0 +1,538 @@
+# BhoomiSetu Citizen Dashboard - Complete User Guide
+
+## What is BhoomiSetu?
+
+BhoomiSetu is a blockchain-powered land registry platform that brings transparency, security, and efficiency to property ownership in India. The platform uses a hybrid blockchain architecture combining Hyperledger Fabric (for authoritative governance) and Polygon Amoy (for public verification), ensuring both privacy and transparency.
+
+---
+
+## Getting Started
+
+### How to Access BhoomiSetu
+
+1. **Visit the Platform**: Navigate to the BhoomiSetu web application
+2. **Login Options**:
+   - **Phone Number + OTP**: Enter your mobile number to receive a one-time password
+   - **Demo Account**: Use the "Demo Account" option to explore the platform without OTP
+3. **First-Time Users**: You'll be prompted to complete e-KYC verification before making transactions
+
+### User Roles
+
+- **Citizen**: Property owners who can view, manage, and transfer their land parcels
+- **Registrar**: Government officials who verify and approve property transactions (separate login via e-Pramaan)
+
+---
+
+## Dashboard Overview
+
+### My Properties
+
+The main dashboard displays all your registered properties in a card-based layout. Each property card shows:
+
+- **ULPIN (Unique Land Parcel Identification Number)**: Your property's unique identifier based on geographic coordinates
+- **Property Address**: Location or block name
+- **Block Type**: Classification (e.g., "Private Owned", "Public")
+- **Area**: Total land area in square feet
+- **Registration Date**: When the property was registered on the blockchain
+- **Status Badge**: 
+  - **ACTIVE** (green): Property is ready for transactions
+  - **PENDING** (yellow): Awaiting verification or processing
+- **Ownership Type**: Private or Public
+
+### Search Functionality
+
+Use the search bar to quickly find properties by:
+- ULPIN number
+- Survey number
+- Apartment ID
+- Property address
+
+---
+
+## e-KYC Verification
+
+Before you can transfer property ownership, you must complete identity verification. This is a 4-step process:
+
+### Step 1: Aadhaar Authentication
+- Enter your 12-digit Aadhaar number
+- Consent to BhoomiSetu fetching your identity details from UIDAI
+- Click "Get OTP" to receive a verification code on your Aadhaar-linked mobile
+
+### Step 2: OTP Verification
+- Enter the 6-digit OTP sent to your mobile
+- The system verifies your identity with UIDAI
+- Your Aadhaar is now linked to your BhoomiSetu account
+
+### Step 3: DigiLocker Integration
+- Connect your DigiLocker account to securely fetch PAN and other certificates
+- This enables seamless document verification for property transactions
+- Click "Connect DigiLocker" and authorize the connection
+
+### Step 4: Completion
+- A Soulbound Token (SBT) is minted to your wallet
+- This non-transferable token proves your verified identity on the blockchain
+- You can now perform property transfers and other transactions
+
+**Important**: The e-KYC banner will appear on your dashboard until verification is complete.
+
+---
+
+## Property Details View
+
+Click on any property card to see comprehensive details:
+
+### Overview Tab
+
+**Satellite Map**:
+- Interactive map showing your property's exact location
+- Verified satellite imagery with boundary markers
+- Zoom and pan controls for detailed inspection
+
+**Property Details**:
+- Total Area (in sq.ft)
+- Block Type
+- Registration Date
+- Market Value (estimated)
+
+**Owner Information**:
+- Owner name with initials badge
+- User ID (UID)
+- Aadhaar verification status
+
+### Ownership Timeline Tab
+
+View the complete chain of custody for your property:
+- **Current Owner**: Your name and acquisition date
+- **Previous Owners**: Historical ownership records
+- **Transaction Hashes**: Blockchain proof for each transfer
+- **Transfer Dates**: Exact timestamps of ownership changes
+
+This immutable timeline ensures transparency and prevents fraud.
+
+### Documents Tab
+
+Access all property-related legal documents:
+
+**Available Documents**:
+- **Sales Deed**: Proof of purchase
+- **Encumbrance Certificate (EC)**: Confirms no legal dues
+- **Tax Receipts**: Property tax payment records
+- **Mutation Register**: Official ownership change records
+
+**Document Actions**:
+- **View**: Preview the document online
+- **Download**: Save a copy to your device
+- **Status**: See verification status (Verified/Pending)
+
+### Transfer Tab
+
+Initiate ownership transfer to another party:
+1. Click "Start Transfer Process"
+2. You'll be redirected to the transfer workflow (see Transfer Process section)
+
+### Legal Status Tab
+
+Check your property's legal standing:
+
+**Jurisdiction Status**:
+- **Clear**: No active legal disputes or court stays
+- **Flagged**: Boundary disputes or pending legal issues
+
+**Recorded Discrepancies**:
+- View any historical boundary mismatches
+- See resolution status and descriptions
+- All issues are timestamped and immutable
+
+---
+
+## Transfer Process
+
+### How to Transfer Property Ownership
+
+1. **Navigate to Transfer**:
+   - From Property Details, click "Transfer Ownership" in Quick Actions
+   - Or click "Request Transfer" tab
+
+2. **Verify Property Details**:
+   - Confirm the property ID and address
+   - Ensure you have completed e-KYC verification
+
+3. **Enter ULPIN**:
+   - Re-enter the property's ULPIN for verification
+   - This prevents accidental transfers
+
+4. **Upload Documents**:
+   - Drag and drop or click to upload:
+     - Sale Deed
+     - Identity Proof
+     - Any supporting legal documents
+   - Multiple files supported
+
+5. **Submit to Registrar**:
+   - Review all information
+   - Click "Submit to Registrar"
+   - Your request is forwarded for manual verification
+
+6. **Wait for Approval**:
+   - You'll receive a confirmation that your request was submitted
+   - The Registrar will verify all documents
+   - You'll be notified once verification is complete
+   - The transfer is recorded on the blockchain
+
+**Important Notes**:
+- All transfers require Registrar approval
+- Ensure all uploaded documents are valid and legible
+- The process typically takes 3-5 business days
+- All actions are recorded on the immutable ledger
+
+---
+
+## Documents Center
+
+Access all your property documents in one place:
+
+### Features
+
+**Centralized Repository**:
+- View documents from all your properties
+- Organized by property and document type
+- Quick search and filter options
+
+**Document Information**:
+- Document type (Sales Deed, EC, Tax Receipt, etc.)
+- Associated property address and Parcel ID
+- Issue date
+- Verification status
+
+**Actions**:
+- **View**: Open document in browser
+- **Download**: Save to your device
+- **Request Certified Copy**: Get an official certified copy from authorities
+
+**Verification Status**:
+- **Verified** (green): Document has been authenticated by authorities
+- **Pending** (yellow): Under review or awaiting verification
+
+---
+
+## Audit Log
+
+View the complete, immutable history of all activities on your account:
+
+### What's Recorded
+
+- **Transfer Requests**: When you initiate ownership transfers
+- **Registrations**: New property additions to your portfolio
+- **Disputes**: Any flagged boundary or legal issues
+- **Document Actions**: Uploads, downloads, and verifications
+- **KYC Events**: Identity verification milestones
+
+### Audit Information
+
+Each log entry shows:
+- **Timestamp**: Exact date and time of action
+- **Action Type**: What happened (color-coded badge)
+- **Performed By**: Who initiated the action (wallet address or user ID)
+- **Details**: Description of the activity
+
+**Why This Matters**:
+- Complete transparency of all system activities
+- Blockchain-backed immutability (cannot be altered or deleted)
+- Proof for legal disputes or verification
+- Compliance with regulatory requirements
+
+---
+
+## Understanding ULPIN (Bhu-Aadhar)
+
+### What is ULPIN?
+
+ULPIN (Unique Land Parcel Identification Number), also known as Bhu-Aadhar, is a 14-digit unique identification number for every land parcel in India.
+
+### How ULPIN is Generated
+
+1. **Geographic Coordinates**: Based on your property's latitude and longitude
+2. **Administrative Boundaries**: Incorporates state, district, and sub-district codes
+3. **Parcel-Specific Data**: Unique identifier for the specific plot
+
+### Why ULPIN Matters
+
+- **Nationwide Compatibility**: Works across all states and territories
+- **Prevents Duplication**: Each parcel has exactly one ULPIN
+- **Enables Digital Transactions**: Foundation for blockchain-based property records
+- **Interoperability**: Compatible with other government systems
+
+### Where to Find Your ULPIN
+
+- Displayed prominently on every property card
+- Shown in Property Details view
+- Included in all official documents
+- Used for search and verification
+
+---
+
+## Blockchain Technology Explained
+
+### Hybrid Architecture
+
+BhoomiSetu uses two blockchain layers for optimal security and transparency:
+
+**1. Hyperledger Fabric (Authoritative Layer)**:
+- **Purpose**: Primary ledger for governance and property metadata
+- **Privacy**: Permissioned network - only authorized registrars can commit data
+- **Function**: Handles land transfers, ownership records, and complex transactions
+- **Storage**: SHA256 hashes of all assets in the Fabric State Database
+
+**2. Polygon Amoy (Public Verification Layer)**:
+- **Purpose**: Immutable public proof
+- **Transparency**: Anyone can verify records without seeing private data
+- **Function**: Periodic "anchoring" of Fabric state hashes to public Ethereum network
+- **Verification**: Compare local hash with public anchor to detect tampering
+
+### How It Protects You
+
+**Immutability**:
+- Once recorded, data cannot be altered or deleted
+- Historical records are permanently preserved
+- Prevents backdating or fraudulent modifications
+
+**Transparency**:
+- All transactions are traceable
+- Public verification without exposing private details
+- Zero-knowledge trust model
+
+**Security**:
+- Cryptographic hashing ensures data integrity
+- Multi-signature requirements for critical actions
+- Distributed ledger prevents single point of failure
+
+**Decentralization**:
+- No single authority controls the entire system
+- Reduces corruption and manipulation risks
+- Government oversight with public accountability
+
+---
+
+## Quick Actions Guide
+
+### From Dashboard
+
+- **View Property**: Click any property card
+- **Search**: Use the search bar for ULPIN or address
+- **Complete KYC**: Click "Verify Now" on the KYC banner
+- **Access Documents**: Click "Documents" in the navigation menu
+- **View Audit Log**: Click "Audit" in the navigation menu
+
+### From Property Details
+
+- **View Deeds**: Quick action button in sidebar
+- **Check Discrepancies**: Quick action button in sidebar
+- **Transfer Ownership**: Primary action button in sidebar
+- **Download Documents**: Available in Documents tab
+- **View Timeline**: Switch to Ownership Timeline tab
+
+---
+
+## Frequently Asked Questions
+
+### Account & Access
+
+**Q: I didn't receive the OTP. What should I do?**
+A: Use the "Demo Account" option to access the platform, or verify your phone number is correct and try again.
+
+**Q: Can I use BhoomiSetu on mobile?**
+A: Yes! The platform is fully responsive and works on smartphones, tablets, and desktops.
+
+**Q: Is my data secure?**
+A: Absolutely. All data is encrypted and stored on blockchain. Your personal information is protected by Aadhaar's security protocols.
+
+### e-KYC Verification
+
+**Q: Why do I need to complete e-KYC?**
+A: e-KYC verification ensures that only verified property owners can transfer land, preventing fraud and unauthorized transactions.
+
+**Q: What is a Soulbound Token?**
+A: A non-transferable digital token minted to your wallet that proves your verified identity. It cannot be sold or transferred to others.
+
+**Q: Can I skip DigiLocker integration?**
+A: DigiLocker integration is optional but highly recommended for seamless document verification during property transfers.
+
+### Property Management
+
+**Q: How do I add a new property?**
+A: New properties must be registered by authorized Registrars. Contact your local land registry office to initiate registration.
+
+**Q: Can I update property details?**
+A: Property details are immutable once recorded on the blockchain. For corrections, contact the Registrar with supporting documentation.
+
+**Q: What if my property status shows "Pending"?**
+A: Pending status means the property is awaiting verification or processing. Contact the Registrar for status updates.
+
+### Transfers
+
+**Q: How long does a transfer take?**
+A: Typically 3-5 business days for Registrar verification. You'll be notified once approved.
+
+**Q: Can I cancel a transfer request?**
+A: Contact the Registrar immediately if you need to cancel. Once approved and recorded on blockchain, transfers are irreversible.
+
+**Q: What documents do I need for transfer?**
+A: Sale Deed, identity proof (Aadhaar), and any supporting legal documents. The Registrar may request additional documents.
+
+### Blockchain & Technology
+
+**Q: What is a transaction hash?**
+A: A unique cryptographic identifier for each blockchain transaction. It serves as permanent proof that the transaction occurred.
+
+**Q: Can blockchain records be hacked?**
+A: Blockchain is extremely secure due to cryptographic hashing and distributed architecture. Altering records would require compromising the entire network, which is practically impossible.
+
+**Q: How can I verify my property on the public blockchain?**
+A: Visit the Polygon Amoy explorer and search for the transaction hash shown in your ownership timeline.
+
+### Documents
+
+**Q: Are digital documents legally valid?**
+A: Yes. Documents verified and stored on BhoomiSetu are legally recognized as they're authenticated by government authorities.
+
+**Q: Can I upload my own documents?**
+A: You can upload documents during transfer requests. Official documents are added by Registrars after verification.
+
+**Q: How do I get a certified copy?**
+A: Click "Request Certified Copy" in the Documents section. The request will be forwarded to authorities.
+
+---
+
+## Security Best Practices
+
+### Protect Your Account
+
+1. **Never share your OTP** with anyone, including BhoomiSetu staff
+2. **Keep your phone number updated** for security notifications
+3. **Complete e-KYC** to enable advanced security features
+4. **Review audit logs regularly** to detect unauthorized activity
+5. **Use secure networks** when accessing BhoomiSetu (avoid public WiFi)
+
+### Verify Before Transferring
+
+1. **Double-check recipient details** before submitting transfer requests
+2. **Verify ULPIN matches** your intended property
+3. **Ensure all documents are authentic** before uploading
+4. **Keep copies of all documents** for your records
+5. **Contact Registrar if suspicious** activity is detected
+
+### Data Privacy
+
+- Your Aadhaar details are encrypted and never shared publicly
+- Only authorized Registrars can access sensitive information
+- Blockchain records contain hashes, not raw personal data
+- You control what information is shared during transfers
+
+---
+
+## Support & Help
+
+### Getting Assistance
+
+**Technical Issues**:
+- Check the FAQ section first
+- Contact BhoomiSetu support via the help menu
+- Report bugs or errors with screenshots
+
+**Property Questions**:
+- Contact your local Registrar office
+- Use the "Audit" section to track your requests
+- Check property status in the dashboard
+
+**Legal Matters**:
+- Consult with legal counsel for property disputes
+- Review the Legal Status tab for jurisdiction information
+- Keep all blockchain transaction hashes as proof
+
+### Important Contacts
+
+- **Registrar Office**: Contact details available in your property records
+- **UIDAI (Aadhaar)**: For Aadhaar-related issues
+- **DigiLocker Support**: For document access problems
+- **BhoomiSetu Support**: For platform technical assistance
+
+---
+
+## Glossary of Terms
+
+**Aadhaar**: 12-digit unique identity number issued by UIDAI to Indian residents
+
+**Blockchain**: Distributed ledger technology that records transactions immutably
+
+**Bhu-Aadhar**: Another name for ULPIN (land parcel identification)
+
+**DigiLocker**: Government platform for storing and sharing digital documents
+
+**e-KYC**: Electronic Know Your Customer - digital identity verification
+
+**Encumbrance Certificate (EC)**: Document showing property is free from legal dues
+
+**Hyperledger Fabric**: Enterprise blockchain framework for permissioned networks
+
+**Immutable**: Cannot be changed or deleted once recorded
+
+**Mutation**: Official transfer of property ownership in government records
+
+**Polygon Amoy**: Ethereum testnet used for public blockchain verification
+
+**Registrar**: Government official authorized to verify and record property transactions
+
+**SHA256**: Cryptographic hash function used to secure blockchain data
+
+**Smart Contract**: Self-executing code on blockchain that automates transactions
+
+**Soulbound Token (SBT)**: Non-transferable digital token proving verified identity
+
+**Transaction Hash**: Unique identifier for blockchain transactions
+
+**UIDAI**: Unique Identification Authority of India (manages Aadhaar)
+
+**ULPIN**: Unique Land Parcel Identification Number (14-digit property ID)
+
+**Wallet**: Digital account for storing blockchain tokens and credentials
+
+---
+
+## Platform Features Summary
+
+### What You Can Do
+
+✅ **View all your properties** in one dashboard
+✅ **Search by ULPIN** or address
+✅ **See satellite imagery** of your land
+✅ **Track ownership history** with blockchain proof
+✅ **Access all documents** in one place
+✅ **Transfer property** with Registrar verification
+✅ **Verify identity** via Aadhaar and DigiLocker
+✅ **Check legal status** and disputes
+✅ **Audit all activities** with immutable logs
+✅ **Download documents** anytime, anywhere
+✅ **Verify on public blockchain** for transparency
+
+### What Makes BhoomiSetu Different
+
+🔒 **Blockchain Security**: Immutable, tamper-proof records
+🌐 **Public Verification**: Anyone can verify authenticity
+🏛️ **Government Integration**: Aadhaar, DigiLocker, e-Pramaan
+📱 **Mobile-Friendly**: Access from any device
+⚡ **Fast Transfers**: 3-5 days vs. weeks/months traditionally
+🔍 **Complete Transparency**: Full audit trail of all activities
+🛡️ **Fraud Prevention**: Multi-layer verification and blockchain proof
+📄 **Digital Documents**: No more physical paperwork
+🌍 **Nationwide Standard**: ULPIN works across all states
+🤝 **Hybrid Trust**: Enterprise privacy + public accountability
+
+---
+
+## Conclusion
+
+BhoomiSetu revolutionizes land registry in India by combining the security of blockchain technology with the convenience of digital platforms. Whether you're viewing your properties, transferring ownership, or verifying legal status, every action is secure, transparent, and backed by immutable blockchain records.
+
+By completing e-KYC and familiarizing yourself with the platform, you're taking control of your property rights in the digital age. The hybrid blockchain architecture ensures that your data remains private while still being publicly verifiable—the best of both worlds.
+
+For any questions or assistance, refer to this guide or contact BhoomiSetu support. Welcome to the future of land records!

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -49,21 +49,7 @@ export const RegistrarDashboard: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-6 animate-in fade-in duration-500 min-h-[calc(100vh-140px)]">
-            {/* KYC Banner - Registrar Role */}
-            <GlassCard className="bg-gradient-to-r from-purple-600/20 to-primary/20 border-primary/30 flex justify-between items-center p-4">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-white">Registrar Identity Verification</h3>
-                        <p className="text-xs text-blue-200">Authenticate your digital signature credentials for secure approvals.</p>
-                    </div>
-                </div>
-                <Button size="sm" onClick={() => window.location.href = '/kyc'}>Verify Now</Button>
-            </GlassCard>
+
 
             <div className="flex flex-col lg:flex-row gap-6 h-full">
 
@@ -170,34 +156,81 @@ const UnitRegistrationForm = () => (
     </div>
 );
 
-const TransferApprovals = () => (
-    <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
-        <div className="border-b border-white/10 pb-4 mb-6 flex justify-between items-center">
-            <div>
-                <h2 className="text-2xl font-bold text-white">Pending Approvals</h2>
-                <p className="text-text-muted">Review and approve ownership transfer requests.</p>
-            </div>
-            <Badge label="3 Pending" variant="warning" />
-        </div>
+const TransferApprovals = () => {
+    const [transfers, setTransfers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-        {/* List of Pending Transfers */}
-        <div className="space-y-4">
-            {[1, 2, 3].map(i => (
-                <div key={i} className="bg-surface/30 border border-white/5 rounded-lg p-4 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center hover:bg-surface/50 transition-colors">
-                    <div>
-                        <p className="font-semibold text-white">Transfer Request #TR-{202400 + i}</p>
-                        <p className="text-sm text-text-muted mt-1">Parcel: <span className="text-primary font-mono">P-10{i}</span> • From: <span className="text-white">User A</span> → To: <span className="text-white">User B</span></p>
-                    </div>
-                    <div className="flex gap-2 w-full md:w-auto">
-                        <Button size="sm" variant="outline" fullWidth className="md:w-auto">View Docs</Button>
-                        <Button size="sm" variant="secondary" fullWidth className="md:w-auto text-red-300 hover:text-red-200 hover:bg-red-500/20">Reject</Button>
-                        <Button size="sm" fullWidth className="md:w-auto bg-green-600 hover:bg-green-500 text-white">Approve</Button>
-                    </div>
+    const fetchTransfers = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/transfers/pending`);
+            const data = await response.json();
+            setTransfers(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Failed to fetch transfers", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTransfers();
+    }, []);
+
+    const handleAction = async (requestId: string, action: 'APPROVED' | 'REJECTED' | 'SUSPICIOUS') => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/transfers/${requestId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: action, remarks: `Marked as ${action} by Registrar` })
+            });
+
+            if (response.ok) {
+                // Refresh list
+                fetchTransfers();
+            } else {
+                alert('Failed to update status');
+            }
+        } catch (error) {
+            console.error("Error updating status", error);
+        }
+    };
+
+    return (
+        <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
+            <div className="border-b border-white/10 pb-4 mb-6 flex justify-between items-center">
+                <div>
+                    <h2 className="text-2xl font-bold text-white">Pending Approvals</h2>
+                    <p className="text-text-muted">Review and approve ownership transfer requests.</p>
                 </div>
-            ))}
+                <Badge label={`${transfers.length} Pending`} variant="warning" />
+            </div>
+
+            {/* List of Pending Transfers */}
+            <div className="space-y-4">
+                {loading ? (
+                    <p className="text-white">Loading requests...</p>
+                ) : transfers.length === 0 ? (
+                    <p className="text-text-muted">No pending transfer requests.</p>
+                ) : (
+                    transfers.map((t: any) => (
+                        <div key={t.requestId} className="bg-surface/30 border border-white/5 rounded-lg p-4 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center hover:bg-surface/50 transition-colors">
+                            <div>
+                                <p className="font-semibold text-white">Transfer Request #{t.requestId}</p>
+                                <p className="text-sm text-text-muted mt-1">Parcel: <span className="text-primary font-mono">{t.assetId}</span> • From: <span className="text-white">{t.sellerId}</span> → To: <span className="text-white">{t.buyerId}</span></p>
+                                <p className="text-xs text-text-muted mt-1">Docs: {JSON.parse(t.documents || '[]').join(', ')}</p>
+                            </div>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <Button size="sm" variant="outline" fullWidth className="md:w-auto" onClick={() => handleAction(t.requestId, 'SUSPICIOUS')}>Flag</Button>
+                                <Button size="sm" variant="secondary" fullWidth className="md:w-auto text-red-300 hover:text-red-200 hover:bg-red-500/20" onClick={() => handleAction(t.requestId, 'REJECTED')}>Reject</Button>
+                                <Button size="sm" fullWidth className="md:w-auto bg-green-600 hover:bg-green-500 text-white" onClick={() => handleAction(t.requestId, 'APPROVED')}>Approve</Button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const EncumbranceManager = () => (
     <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-300">

@@ -29,6 +29,30 @@ router.get('/registrar/login', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * POST /api/auth/registrar/demo-login
+ * Creates a demo session for testing without Auth0
+ */
+router.post('/registrar/demo-login', (req: Request, res: Response) => {
+    const claims: RegistrarClaims = {
+        sub: 'demo-registrar-001',
+        name: 'Demo Registrar',
+        email: 'registrar@demo.gov.in',
+        role: 'Sub-Registrar',
+        designation: 'Sub-Registrar',
+        jurisdiction: 'District A'
+    };
+
+    const sessionToken = Buffer.from(JSON.stringify({
+        sub: claims.sub,
+        iat: Date.now()
+    })).toString('base64');
+
+    registrarSessions.set(sessionToken, { claims });
+
+    res.json({ success: true, token: sessionToken });
+});
+
 
 
 /**

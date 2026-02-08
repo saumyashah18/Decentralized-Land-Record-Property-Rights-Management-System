@@ -11,6 +11,7 @@ starlette
 # HuggingFace for BGE-M3 embeddings
 huggingface-hub
 requests
+sentence-transformers
 
 # FAISS for vector storage (CPU version)
 faiss-cpu

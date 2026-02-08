@@ -15,7 +15,7 @@ class BGEEmbeddings:
     """
     
     def __init__(self):
-        self.api_url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{EMBEDDING_MODEL}"
+        self.api_url = f"https://router.huggingface.co/models/{EMBEDDING_MODEL}"
         self.headers = {"Authorization": f"Bearer {HF_API_KEY}"}
     
     def embed_text(self, text: str) -> List[float]:

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhoomiSetu - ULPIN Consortium Blockchain Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px;
+            text-align: center;
+            position: relative;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .flow-step h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .flow-step p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        .property-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .property-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .property-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .property-detail:last-child {
+            border-bottom: none;
+        }
+
+        .property-detail .label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .property-detail .value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .hash-display {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+
+        .blockchain-visual {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .blockchain-node {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+        }
+
+        .blockchain-node h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .block-header {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .block-content {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-success {
+            background: #48bb78;
+        }
+
+        .status-pending {
+            background: #ed8936;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #667eea;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ BhoomiSetu - ULPIN Consortium Blockchain Demo</h1>
+            <p>Demonstrating Hybrid Blockchain Architecture with Hyperledger Fabric & Ethereum</p>
+        </div>
+
+        <!-- Property Information -->
+        <div class="demo-section">
+            <h2 class="section-title">📋 Property Information</h2>
+            <div class="property-card">
+                <h4>Property Details</h4>
+                <div class="property-detail">
+                    <span class="label">ULPIN (Bhu-Aadhar):</span>
+                    <span class="value highlight">27-001-0012-001-000123</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">Location:</span>
+                    <span class="value">Survey No. 123, Village Kharadi, Pune, Maharashtra</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">Area:</span>
+                    <span class="value">2500 sq.m</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">Owner:</span>
+                    <span class="value">Rajesh Kumar (CITIZEN-001)</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">Status:</span>
+                    <span class="value"><span class="status-indicator status-success"></span>Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hash Generation Flow -->
+        <div class="demo-section">
+            <h2 class="section-title">🔐 Consortium Hash Generation Flow</h2>
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <h3>1️⃣ ULPIN</h3>
+                    <p>Unique Land Parcel Identification Number</p>
+                    <div class="hash-display">27-001-0012-001-000123</div>
+                </div>
+                <span class="arrow">→</span>
+                <div class="flow-step">
+                    <h3>2️⃣ Fabric TX</h3>
+                    <p>Hyperledger Fabric Transaction</p>
+                    <div class="hash-display">0xa7f3c9d2...</div>
+                </div>
+                <span class="arrow">→</span>
+                <div class="flow-step">
+                    <h3>3️⃣ IFSC Hash</h3>
+                    <p>Bank Verification</p>
+                    <div class="hash-display">0x8e4b1f6a...</div>
+                </div>
+                <span class="arrow">→</span>
+                <div class="flow-step">
+                    <h3>4️⃣ Consortium Hash</h3>
+                    <p>Combined Hash</p>
+                    <div class="hash-display">0x5c9a2d7e...</div>
+                </div>
+                <span class="arrow">→</span>
+                <div class="flow-step">
+                    <h3>5️⃣ Ethereum Anchor</h3>
+                    <p>Public Verification</p>
+                    <div class="hash-display">0x3f8d4b2c...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blockchain Visualization -->
+        <div class="demo-section">
+            <h2 class="section-title">⛓️ Dual Blockchain Architecture</h2>
+            <div class="blockchain-visual">
+                <div class="blockchain-node">
+                    <h3>📘 Hyperledger Fabric (Private)</h3>
+                    <div class="block">
+                        <div class="block-header"><span class="status-indicator status-success"></span>Property Creation</div>
+                        <div class="block-content">
+                            <strong>ULPIN:</strong> 27-001-0012-001-000123<br>
+                            <strong>Owner:</strong> CITIZEN-001<br>
+                            <strong>Area:</strong> 2500 sq.m<br>
+                            <strong>Doc Hash:</strong> 0xb4c8f3e2...<br>
+                            <strong>Timestamp:</strong> 2026-02-08 09:00:00
+                        </div>
+                    </div>
+                    <div class="block">
+                        <div class="block-header"><span class="status-indicator status-success"></span>Transfer Request</div>
+                        <div class="block-content">
+                            <strong>Request ID:</strong> TR-1707372000<br>
+                            <strong>From:</strong> CITIZEN-001<br>
+                            <strong>To:</strong> CITIZEN-002<br>
+                            <strong>Type:</strong> SALE<br>
+                            <strong>Status:</strong> Initiated
+                        </div>
+                    </div>
+                </div>
+
+                <div class="blockchain-node">
+                    <h3>💎 Ethereum (Public)</h3>
+                    <div class="block">
+                        <div class="block-header"><span class="status-indicator status-success"></span>Anchor #1: PROPERTY_CREATION</div>
+                        <div class="block-content">
+                            <strong>ULPIN:</strong> 27-001-0012-001-000123<br>
+                            <strong>Hash:</strong> 0x5c9a2d7e3f1b8a4c...<br>
+                            <strong>Block:</strong> #1234567<br>
+                            <strong>TX Hash:</strong> 0x3f8d4b2c9e7a1f5d...<br>
+                            <strong>Gas Used:</strong> 85,432
+                        </div>
+                    </div>
+                    <div class="block">
+                        <div class="block-header"><span class="status-indicator status-success"></span>Anchor #2: PROPERTY_TRANSFER</div>
+                        <div class="block-content">
+                            <strong>ULPIN:</strong> 27-001-0012-001-000123<br>
+                            <strong>Hash:</strong> 0x9d2e5f8a1c4b7e3a...<br>
+                            <strong>Block:</strong> #1234568<br>
+                            <strong>TX Hash:</strong> 0x7c1f9a3e5d8b2f4a...<br>
+                            <strong>Gas Used:</strong> 87,651
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction Timeline -->
+        <div class="demo-section">
+            <h2 class="section-title">📅 Transaction Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <strong>Step 1: ULPIN Generation</strong><br>
+                        Generated unique identifier: <span class="highlight">27-001-0012-001-000123</span><br>
+                        Format: State-District-SubDistrict-Village-PlotNumber
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <strong>Step 2: Property Registration on Fabric</strong><br>
+                        Created parcel on Hyperledger Fabric with full property details<br>
+                        Fabric TX Hash: <code>0xa7f3c9d2e8f1b4a6c3d5e7f9...</code>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <strong>Step 3: Bank Verification (IFSC)</strong><br>
+                        Bank: <span class="highlight">SBIN0001234</span> (State Bank of India)<br>
+                        Amount: ₹50,00,000 (Registration Fee)<br>
+                        IFSC Hash: <code>0x8e4b1f6a9c2d5e7f3a1b4c8d...</code>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <strong>Step 4: Consortium Hash Generation</strong><br>
+                        Combined ULPIN + Fabric TX + IFSC Hash<br>
+                        Consortium Hash: <code>0x5c9a2d7e3f1b8a4c6d9e2f5a...</code>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <strong>Step 5: Ethereum Anchoring via Web3.js</strong><br>
+                        Anchored consortium hash to Ethereum smart contract<br>
+                        Contract: <code>0x5FbDB2315678afecb367f032d93F642f64180aa3</code><br>
+                        Ethereum TX: <code>0x3f8d4b2c9e7a1f5d8b3c6e9f...</code>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <strong>Step 6: Transfer Initiated</strong><br>
+                        Transfer request from CITIZEN-001 to CITIZEN-002<br>
+                        New IFSC: <span class="highlight">HDFC0001234</span> (₹1,00,00,000)<br>
+                        Transfer Hash anchored to Ethereum
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="demo-section">
+            <h2 class="section-title">🖥️ System Status</h2>
+            <div class="property-card">
+                <h4>All Servers Running</h4>
+                <div class="property-detail">
+                    <span class="label">Hyperledger Fabric Network:</span>
+                    <span class="value"><span class="status-indicator status-success"></span>Running (localhost:7051, 9051)</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">Ethereum/Hardhat Node:</span>
+                    <span class="value"><span class="status-indicator status-success"></span>Running (localhost:8545)</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">Node.js API Server:</span>
+                    <span class="value"><span class="status-indicator status-success"></span>Running (localhost:8000)</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">RAG Server (Bhoomika):</span>
+                    <span class="value"><span class="status-indicator status-success"></span>Running (localhost:8001)</span>
+                </div>
+                <div class="property-detail">
+                    <span class="label">AnchorRegistry Contract:</span>
+                    <span class="value"><span class="status-indicator status-success"></span>0x5FbDB2315678afecb367f032d93F642f64180aa3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="demo-section">
+            <h2 class="section-title">✨ Key Features Demonstrated</h2>
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <h3>🔒 Privacy</h3>
+                    <p>Full property details stored privately on Hyperledger Fabric consortium</p>
+                </div>
+                <div class="flow-step">
+                    <h3>🌐 Transparency</h3>
+                    <p>Cryptographic hashes anchored publicly on Ethereum for verification</p>
+                </div>
+                <div class="flow-step">
+                    <h3>🏦 Integration</h3>
+                    <p>Bank verification via IFSC codes integrated into hash chain</p>
+                </div>
+                <div class="flow-step">
+                    <h3>⚡ Immutability</h3>
+                    <p>All transactions permanently recorded across both blockchains</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

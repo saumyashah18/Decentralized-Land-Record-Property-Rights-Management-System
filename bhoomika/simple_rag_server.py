@@ -31,14 +31,19 @@ SQLITE_DB_PATH = os.path.join(DATA_DIR, "bhoomika.db")
 
 # API Keys
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+print(f"Loaded API Key: {OPENROUTER_API_KEY[:10]}...{OPENROUTER_API_KEY[-4:] if OPENROUTER_API_KEY else 'None'}")
 EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
 
 # Configure OpenAI (OpenRouter)
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=OPENROUTER_API_KEY,
+    default_headers={
+        "HTTP-Referer": "https://bhoomisetu.gov.in", # Required by OpenRouter for free models
+        "X-Title": "BhoomiSetu Assistant",
+    }
 )
-MODEL_NAME = "deepseek/deepseek-r1:free"
+MODEL_NAME = "openrouter/auto"  # Automatically selects best available free model
 
 # --- DB & MODELS ---
 Base = declarative_base()
@@ -49,6 +54,7 @@ class Chunk(Base):
     document_id = Column(String(50), ForeignKey('documents.id'), nullable=False)
     content = Column(Text, nullable=False)
     chunk_index = Column(Integer)
+    chunk_type = Column(String(10), default='M')  # S, M, or L for multi-granularity
 
 def get_db_session():
     engine = create_engine(f'sqlite:///{SQLITE_DB_PATH}')
