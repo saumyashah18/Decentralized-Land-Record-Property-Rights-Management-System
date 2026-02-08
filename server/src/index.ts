@@ -39,6 +39,16 @@ app.use('/api/kyc', kycRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 
+// Root Route
+app.get('/', (req: Request, res: Response) => {
+    res.json({
+        message: 'Welcome to BhoomiSetu API',
+        version: '1.0.0',
+        docs: '/health'
+    });
+});
+
+
 // Health Check
 app.get('/health', async (req: Request, res: Response) => {
     const healthStatus: any = {
